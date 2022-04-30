@@ -17,8 +17,7 @@ from settings import *
 from sprites import *
 from savefiles import *
 from tilemap import *
-#test
-#dafug
+
 
 # HUD functions
 def draw_player_health(surf, x, y, pct):
