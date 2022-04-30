@@ -283,6 +283,7 @@ class Game:
                     write_file("save", "TEST", "KEK")
                     pass
 
+
     def show_start_screen(self):
         self.screen.fill(BLACK)
         self.draw_text("START GAME", self.title_font, 100, YELLOW, WIDTH / 2, HEIGHT / 2, align="center")
