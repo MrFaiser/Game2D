@@ -1,8 +1,4 @@
-# KidsCanCode - Game Development with Pygame video series
-# Tile-based game - Part 20
-# More weapons
-# Video link: https://youtu.be/xIcDqw35rz8
-import json
+import  json
 import time
 from pathlib import Path
 
@@ -17,7 +13,9 @@ from settings import *
 from sprites import *
 from savefiles import *
 from tilemap import *
-#test
+#test 2 test-----------
+#test1 lol
+
 # HUD functions
 def draw_player_health(surf, x, y, pct):
     if pct < 0:
