@@ -11,6 +11,7 @@ data = {
     ]
 }
 
+
 def create_file():
     if(os.stat("savefiles/data.json").st_size == 0):
         with open('savefiles/data.json', 'w') as f:

@@ -167,6 +167,7 @@ class Mob(pg.sprite.Sprite):
         if self.health < MOB_HEALTH:
             pg.draw.rect(self.image, col, self.health_bar)
 
+
 class Bullet(pg.sprite.Sprite):
     def __init__(self, game, pos, dir, damage):
         self._layer = BULLET_LAYER

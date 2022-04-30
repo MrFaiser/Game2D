@@ -13,6 +13,7 @@ BROWN = (106, 55, 5)
 ORANGE = (255, 136, 0)
 CYAN = (0, 255, 255)
 
+
 # game settings
 WIDTH = 1024   # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 768  # 16 * 48 or 32 * 24 or 64 * 12
