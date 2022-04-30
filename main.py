@@ -1,7 +1,3 @@
-# KidsCanCode - Game Development with Pygame video series
-# Tile-based game - Part 20
-# More weapons
-# Video link: https://youtu.be/xIcDqw35rz8
 import json
 import time
 from pathlib import Path
@@ -17,8 +13,7 @@ from settings import *
 from sprites import *
 from savefiles import *
 from tilemap import *
-#test
-#dafug
+
 
 # HUD functions
 def draw_player_health(surf, x, y, pct):
@@ -282,7 +277,8 @@ class Game:
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:
-                    write_file("save", "TEST", "KEK")
+                    write_file("save", "COINS", read_file("save","COINS") + 2)
+                    print("+2 Coins")
                     pass
 
 
@@ -312,8 +308,11 @@ class Game:
         pg.display.flip()
         self.wait_for_key()
         c = read_file("save", "CURRENT_LEVEL")
+        print(c)
         c =+ 1
-        write_file()
+        print(c)
+
+        write_file("save", "CURRENT_LEVEL", c)
         self.new()
 
     def wait_for_key(self):
