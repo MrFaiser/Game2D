@@ -8,6 +8,7 @@ from random import choice, random
 from os import path
 
 import settings
+import sprites
 from file_manager import *
 from settings import *
 from sprites import *
@@ -85,7 +86,11 @@ class Game:
         self.bullet_images = {}
         self.bullet_images['lg'] = pg.image.load(path.join(img_folder, BULLET_IMG)).convert_alpha()
         self.bullet_images['sm'] = pg.transform.scale(self.bullet_images['lg'], (10, 10))
-        self.mob_img = pg.image.load(path.join(img_folder, MOB_IMG)).convert_alpha()
+
+        self.mob_img = {}
+        self.mob_img["zombie"] = pg.image.load(path.join(img_folder, MOBS["zombie"]["mob_img"])).convert_alpha()
+        self.mob_img["zombie_strong"] = pg.image.load(path.join(img_folder, MOBS["zombie_strong"]["mob_img"])).convert_alpha()
+
         self.splat = pg.image.load(path.join(img_folder, SPLAT)).convert_alpha()
         self.splat = pg.transform.scale(self.splat, (32, 32))
         self.gun_flashes = []
@@ -146,7 +151,9 @@ class Game:
             if tile_object.name == 'player':
                 self.player = Player(self, obj_center.x, obj_center.y)
             if tile_object.name == 'zombie':
-                Mob(self, obj_center.x, obj_center.y)
+                self.mob = Mob(self, obj_center.x, obj_center.y, "zombie")
+            if tile_object.name == 'zombie_strong':
+                self.mob = Mob(self, obj_center.x, obj_center.y, "zombie_strong")
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y,
                          tile_object.width, tile_object.height)
@@ -205,13 +212,13 @@ class Game:
         for hit in hits:
             if random() < 0.7:
                 choice(self.player_hit_sounds).play()
-            self.player.health -= MOB_DAMAGE
+            self.player.health -= MOBS[self.mob.type]["mob_damage"]
             hit.vel = vec(0, 0)
             if self.player.health <= 0:
                 self.playing = False
         if hits:
             self.player.hit()
-            self.player.pos += vec(MOB_KNOCKBACK, 0).rotate(-hits[0].rot)
+            self.player.pos += vec(MOBS[self.mob.type]["mob_knockback"], 0).rotate(-hits[0].rot)
         # bullets hit mobs
         hits = pg.sprite.groupcollide(self.mobs, self.bullets, False, True)
         for mob in hits:
@@ -254,8 +261,11 @@ class Game:
 
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
-        self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, WHITE, WIDTH - 125, 20, align="center")
-        self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHTGREY, 60, 40, align="center")
+        self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 50, align="w")
+        self.draw_text("Coins: {}".format(read_file("save", "COINS")), self.hud_font, 30, ORANGE, 10, 80, align="w")
+        self.draw_text("Weapon: {}".format(self.player.weapon), self.hud_font, 30, WHITE, 10, 110, align="w")
+
+        self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHTGREY, WIDTH - 50, 10,align="center")
 
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
@@ -307,9 +317,9 @@ class Game:
 
         pg.display.flip()
         self.wait_for_key()
-        c = read_file("save", "CURRENT_LEVEL")
-        c =+ 1
-        write_file()
+        current_level = read_file("save", "CURRENT_LEVEL")
+        current_level =+ 1
+        write_file("save", "CURRENT_LEVEL", current_level)
         self.new()
 
     def wait_for_key(self):

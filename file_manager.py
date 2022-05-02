@@ -6,7 +6,7 @@ data = {
         {
             'NAME': "user",
             'CURRENT_LEVEL': 0,
-            'TEST': 'test3'
+            'COINS': 0
         }
     ]
 }
@@ -14,8 +14,8 @@ data = {
 
 def create_file():
     if(os.stat("savefiles/data.json").st_size == 0):
-        with open('savefiles/data.json', 'w') as f:
-            f.write(json.dumps(data, indent = 4))
+        with open('savefiles/data.json', 'w') as File:
+            File.write(json.dumps(data, indent = 4))
             print(data)
             print("Create File!")
     else:
@@ -23,24 +23,18 @@ def create_file():
 
 
 def read_file(region, key):
-    with open('savefiles/data.json', 'r') as f:
-        daten = json.load(f)
+    with open('savefiles/data.json', 'r') as File:
+        daten = json.load(File)
         for i in daten[region]:
             result = i[key]
         return result
 
 def write_file(region, key, wert):
+    with open("savefiles/data.json", "r") as File:
+        data = json.load(File)
 
-    dat = open('savefiles/data.json', 'r')
-    chance_data = json.load(dat)
+    for k in data[region]:
+        k[key] = wert
 
-    with open('savefiles/data.json', 'w') as f:
-        daten = json.load(f)
-        for i in daten[region]:
-            chance_data[key] = wert
-            #json.dump(chance_data, f)
-            f.write(json.dumps(chance_data, indent=4))
-
-    #    json.dumps(data, indent=10, sort_keys=False)
-
-
+    with open("savefiles/data.json", "w") as File:
+        File.write(json.dumps(data, indent=4))

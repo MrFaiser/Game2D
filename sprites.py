@@ -105,39 +105,43 @@ class Player(pg.sprite.Sprite):
             self.health = PLAYER_HEALTH
 
 class Mob(pg.sprite.Sprite):
-    def __init__(self, game, x, y):
+    def __init__(self, game, x, y, type):
         self._layer = MOB_LAYER
         self.groups = game.all_sprites, game.mobs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
-        self.image = game.mob_img.copy()
+        self.image = game.mob_img[type].copy()
+        #EDIT-----------------------------------
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
-        self.hit_rect = MOB_HIT_RECT.copy()
+        self.type = type
+        self.hit_rect = MOBS[self.type]["mob_hit_rect"].copy()
         self.hit_rect.center = self.rect.center
         self.pos = vec(x, y)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.rect.center = self.pos
         self.rot = 0
-        self.health = MOB_HEALTH
-        self.speed = choice(MOB_SPEEDS)
+        self.health = MOBS[self.type]["mob_health"]
+        self.speed = choice(MOBS[self.type]["mob_speed"])
         self.target = game.player
+
 
     def avoid_mobs(self):
         for mob in self.game.mobs:
             if mob != self:
                 dist = self.pos - mob.pos
-                if 0 < dist.length() < AVOID_RADIUS:
+                if 0 < dist.length() < MOBS[self.type]["avoid_radius"]:
                     self.acc += dist.normalize()
 
     def update(self):
         target_dist = self.target.pos - self.pos
-        if target_dist.length_squared() < DETECT_RADIUS**2:
+        if target_dist.length_squared() < MOBS[self.type]["detect_radius"]**2:
             if random() < 0.002:
                 choice(self.game.zombie_moan_sounds).play()
             self.rot = target_dist.angle_to(vec(1, 0))
-            self.image = pg.transform.rotate(self.game.mob_img, self.rot)
+            self.image = pg.transform.rotate(self.game.mob_img[self.type], self.rot)
+
             self.rect.center = self.pos
             self.acc = vec(1, 0).rotate(-self.rot)
             self.avoid_mobs()
@@ -156,15 +160,16 @@ class Mob(pg.sprite.Sprite):
             self.game.map_img.blit(self.game.splat, self.pos - vec(32, 32))
 
     def draw_health(self):
-        if self.health > 60:
+        pct = MOBS[self.type]["mob_health"]
+        if self.health >= pct * 0.8:
             col = GREEN
-        elif self.health > 30:
+        elif self.health >= pct * 0.3:
             col = YELLOW
         else:
             col = RED
-        width = int(self.rect.width * self.health / MOB_HEALTH)
+        width = int(self.rect.width * self.health / MOBS[self.type]["mob_health"])
         self.health_bar = pg.Rect(0, 0, width, 7)
-        if self.health < MOB_HEALTH:
+        if self.health < MOBS[self.type]["mob_health"]:
             pg.draw.rect(self.image, col, self.health_bar)
 
 

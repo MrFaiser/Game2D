@@ -1,31 +1,6 @@
 import pygame as pg
 vec = pg.math.Vector2
 
-# define some colors (R, G, B)
-WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-DARKGREY = (40, 40, 40)
-LIGHTGREY = (100, 100, 100)
-GREEN = (0, 255, 0)
-DARK_GREEN = (0, 100, 0)
-RED = (255, 0, 0)
-YELLOW = (255, 255, 0)
-BROWN = (106, 55, 5)
-ORANGE = (255, 136, 0)
-CYAN = (0, 255, 255)
-
-
-# game settings
-WIDTH = 1024   # 16 * 64 or 32 * 32 or 64 * 16
-HEIGHT = 768  # 16 * 48 or 32 * 24 or 64 * 12
-FPS = 60
-TITLE = "Tilemap Demo"
-BGCOLOR = BROWN
-
-TILESIZE = 64
-GRIDWIDTH = WIDTH / TILESIZE
-GRIDHEIGHT = HEIGHT / TILESIZE
-
 # Player settings
 PLAYER_HEALTH = 100
 PLAYER_SPEED = 280
@@ -57,26 +32,14 @@ WEAPONS['shotgun'] = {'bullet_speed': 400,
                       'ammo': 10}
 
 # Mob settings
-MOBS = {}
-MOBS["zombie"] = {"mob_img": "zombie1_hold.png",
-                  "mob_speed": [150, 100, 75, 125],
-                  "mob_hit_rect": pg.Rect(0, 0, 30, 30),
-                  "mob_health": 100,
-                  "mob_damage": 10,
-                  "mob_knockback": 20,
-                  "avoid_radius":20,
-                  "detect_radius":400}
-
-MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
-                  "mob_speed": [1000, 10],
-                  "mob_hit_rect": pg.Rect(0, 0, 30, 30),
-                  "mob_health": 1000,
-                  "mob_damage": 80,
-                  "mob_knockback": 20,
-                  "avoid_radius":20,
-                  "detect_radius":400}
-
-
+MOB_IMG = 'zombie1_hold.png'
+MOB_SPEEDS = [150, 100, 75, 125]
+MOB_HIT_RECT = pg.Rect(0, 0, 30, 30)
+MOB_HEALTH = 100
+MOB_DAMAGE = 10
+MOB_KNOCKBACK = 20
+AVOID_RADIUS = 50
+DETECT_RADIUS = 400
 
 # Effects
 MUZZLE_FLASHES = ['whitePuff15.png', 'whitePuff16.png', 'whitePuff17.png',
@@ -101,7 +64,7 @@ ITEMS_LAYER = 1
 # Maps
 #CURRENT_LEVEL = 0
 MAPS = []
-MAPS = ["mapV1.tmx", "home.tmx", "lvl2.tmx"]
+MAPS = ["mapV1.tmx", "home.tmx", "map_lvl1.tmx"]
 
 # Items
 ITEM_IMAGES = {'health': 'health_pack.png',
