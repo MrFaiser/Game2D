@@ -4,7 +4,10 @@ from settings import *
 from tilemap import collide_hit_rect
 import pytweening as tween
 from itertools import chain
+from file_manager import *
+
 vec = pg.math.Vector2
+
 
 def collide_with_walls(sprite, group, dir):
     if dir == 'x':
@@ -137,7 +140,7 @@ class Mob(pg.sprite.Sprite):
     def update(self):
         target_dist = self.target.pos - self.pos
         if target_dist.length_squared() < MOBS[self.type]["detect_radius"]**2:
-            if random() < 0.002:
+            if random() < 0.02:
                 choice(self.game.zombie_moan_sounds).play()
             self.rot = target_dist.angle_to(vec(1, 0))
             self.image = pg.transform.rotate(self.game.mob_img[self.type], self.rot)
@@ -158,6 +161,8 @@ class Mob(pg.sprite.Sprite):
             choice(self.game.zombie_hit_sounds).play()
             self.kill()
             self.game.map_img.blit(self.game.splat, self.pos - vec(32, 32))
+            write_file("save", "COINS", read_file("save", "COINS") + MOBS[self.type]["coin_reward"])
+            self.game.coins_update()
 
     def draw_health(self):
         pct = MOBS[self.type]["mob_health"]

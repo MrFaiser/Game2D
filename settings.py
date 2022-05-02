@@ -42,7 +42,7 @@ WEAPONS['pistol'] = {'bullet_speed': 500,
                      'rate': 250,
                      'kickback': 200,
                      'spread': 5,
-                     'damage': 100,
+                     'damage': 10,
                      'bullet_size': 'lg',
                      'bullet_count': 1,
                      'ammo': 999}
@@ -55,6 +55,15 @@ WEAPONS['shotgun'] = {'bullet_speed': 400,
                       'bullet_size': 'sm',
                       'bullet_count': 12,
                       'ammo': 10}
+WEAPONS['sniper'] = {'bullet_speed': 800,
+                      'bullet_lifetime': 1000,
+                      'rate': 2000,
+                      'kickback': 600,
+                      'spread': 0,
+                      'damage': 99,
+                      'bullet_size': 'lg',
+                      'bullet_count': 1,
+                      'ammo': 5}
 
 # Mob settings
 MOBS = {}
@@ -65,7 +74,8 @@ MOBS["zombie"] = {"mob_img": "zombie1_hold.png",
                   "mob_damage": 10,
                   "mob_knockback": 20,
                   "avoid_radius":20,
-                  "detect_radius":400}
+                  "detect_radius":400,
+                  "coin_reward":1}
 
 MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "mob_speed": [1000, 10],
@@ -74,7 +84,8 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "mob_damage": 80,
                   "mob_knockback": 20,
                   "avoid_radius":20,
-                  "detect_radius":400}
+                  "detect_radius":400,
+                  "coin_reward": 2}
 
 
 
@@ -105,7 +116,8 @@ MAPS = ["mapV1.tmx", "home.tmx", "lvl2.tmx"]
 
 # Items
 ITEM_IMAGES = {'health': 'health_pack.png',
-               "shotgun": "shotgun.png"}
+               "shotgun": "shotgun.png",
+               "sniper": "sniper.png"}
 HEALTH_PACK_AMOUNT = 20
 BOB_RANGE = 15
 BOB_SPEED = 0.4
@@ -117,7 +129,9 @@ ZOMBIE_MOAN_SOUNDS = ['brains2.wav', 'brains3.wav', 'zombie-roar-1.wav', 'zombie
                       'zombie-roar-3.wav', 'zombie-roar-5.wav', 'zombie-roar-6.wav', 'zombie-roar-7.wav']
 ZOMBIE_HIT_SOUNDS = ['splat-15.wav']
 WEAPON_SOUNDS = {'pistol': ['pistol.wav'],
-                 'shotgun': ['shotgun.wav']}
+                 'shotgun': ['shotgun.wav'],
+                 'sniper': ['shotgun.wav']
+                 }
 EFFECTS_SOUNDS = {'level_start': 'level_start.wav',
                   'health_up': 'health_pack.wav',
                   "gun_pickup": "gun_pickup.wav"}

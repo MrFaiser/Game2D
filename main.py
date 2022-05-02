@@ -18,8 +18,10 @@ from settings import *
 from sprites import *
 from savefiles import *
 from tilemap import *
-#test
 # HUD functions
+global coins
+coins = read_file("save","COINS")
+
 def draw_player_health(surf, x, y, pct):
     if pct < 0:
         pct = 0
@@ -157,9 +159,9 @@ class Game:
             if tile_object.name == 'zombie_strong':
                 self.mob = Mob(self, obj_center.x, obj_center.y, "zombie_strong")
             if tile_object.name == 'wall':
-                Obstacle(self, tile_object.x, tile_object.y,
-                         tile_object.width, tile_object.height)
-            if tile_object.name in ['health', "shotgun"]:
+                Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+
+            if tile_object.name in ['health', "shotgun", "sniper"]:
                 Item(self, obj_center, tile_object.name)
 
         self.camera = Camera(self.map.width, self.map.height)
@@ -188,6 +190,12 @@ class Game:
         pg.quit()
         sys.exit()
 
+    def coins_update(self):
+        global coins
+        coins = read_file("save", "COINS")
+        pass
+
+
     def update(self):
         # update portion of the game loop
         self.all_sprites.update()
@@ -209,6 +217,10 @@ class Game:
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "shotgun"
+            if hit.type == "sniper":
+                hit.kill()
+                self.effects_sounds["gun_pickup"].play()
+                self.player.weapon = "sniper"
         # mobs hit player
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
@@ -264,7 +276,8 @@ class Game:
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 50, align="w")
-        self.draw_text("Coins: {}".format(read_file("save", "COINS")), self.hud_font, 30, ORANGE, 10, 80, align="w")
+        self.draw_text("Coins: {}".format(coins), self.hud_font, 30, ORANGE, 10, 80, align="w")
+        #self.draw_text("Coins: {}".format(read_file("save", "COINS")), self.hud_font, 30, ORANGE, 10, 80, align="w")
         self.draw_text("Weapon: {}".format(self.player.weapon), self.hud_font, 30, WHITE, 10, 110, align="w")
 
         self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHTGREY, WIDTH - 50, 10,align="center")
@@ -277,6 +290,7 @@ class Game:
 
     def events(self):
         # catch all events here
+        global coins
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
@@ -290,7 +304,11 @@ class Game:
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:
-                    write_file("save", "TEST", "KEK")
+                    self.coins_update()
+                    write_file("save", "COINS", read_file("save","COINS")+2)
+                    coins = read_file("save", "COINS")
+                    print("+2 Coins")
+
                     pass
 
 

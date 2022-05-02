@@ -1,5 +1,6 @@
 import json
 import os
+import sprites
 
 data = {
     'save': [
@@ -38,3 +39,4 @@ def write_file(region, key, wert):
 
     with open("savefiles/data.json", "w") as File:
         File.write(json.dumps(data, indent=4))
+

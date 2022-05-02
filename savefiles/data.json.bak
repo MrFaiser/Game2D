@@ -2,8 +2,8 @@
     "save": [
         {
             "NAME": "user",
-            "CURRENT_LEVEL": 1,
-            "COINS": 1
+            "CURRENT_LEVEL": 0,
+            "COINS": 11
         }
     ]
 }
