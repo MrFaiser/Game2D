@@ -1,7 +1,3 @@
-# KidsCanCode - Game Development with Pygame video series
-# Tile-based game - Part 20
-# More weapons
-# Video link: https://youtu.be/xIcDqw35rz8
 import json
 import time
 from pathlib import Path
