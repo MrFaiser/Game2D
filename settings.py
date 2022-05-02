@@ -39,7 +39,7 @@ BULLET_IMG = 'bullet.png'
 WEAPONS = {}
 WEAPONS['pistol'] = {'bullet_speed': 500,
                      'bullet_lifetime': 1000,
-                     'rate': 250,
+                     'rate': 50,
                      'kickback': 200,
                      'spread': 5,
                      'damage': 10,
@@ -81,8 +81,8 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "mob_speed": [1000, 10],
                   "mob_hit_rect": pg.Rect(0, 0, 30, 30),
                   "mob_health": 1000,
-                  "mob_damage": 80,
-                  "mob_knockback": 20,
+                  "mob_damage": 800,
+                  "mob_knockback": 200,
                   "avoid_radius":20,
                   "detect_radius":400,
                   "coin_reward": 2}
@@ -112,10 +112,11 @@ ITEMS_LAYER = 1
 # Maps
 #CURRENT_LEVEL = 0
 MAPS = []
-MAPS = ["mapV1.tmx", "home.tmx", "lvl2.tmx"]
+MAPS = ["lvl_tut.tmx", "home.tmx", "lvl1.tmx", "lvl2.tmx"]
 
 # Items
 ITEM_IMAGES = {'health': 'health_pack.png',
+               "door": "door.png",
                "shotgun": "shotgun.png",
                "sniper": "sniper.png"}
 HEALTH_PACK_AMOUNT = 20

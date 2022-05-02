@@ -205,7 +205,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="7" name="wall obj" visible="0" locked="1">
+ <objectgroup id="7" name="wall obj" locked="1">
   <object id="5" name="wall" x="768" y="320" width="64" height="320"/>
   <object id="8" name="wall" x="832" y="320" width="960" height="64"/>
   <object id="9" name="wall" x="1600" y="384" width="64" height="512"/>
@@ -215,7 +215,7 @@
   <object id="14" name="wall" x="1664" y="1088" width="512" height="64"/>
   <object id="15" name="wall" x="2112" y="320" width="64" height="768"/>
   <object id="16" name="wall" x="1984" y="320" width="128" height="64"/>
-  <object id="43" name="wall" x="767" y="702" width="64" height="640"/>
+  <object id="43" name="wall" x="768" y="704" width="64" height="640"/>
   <object id="44" name="wall" x="1152" y="640" width="64" height="64"/>
   <object id="46" name="wall" x="1152" y="640" width="64" height="64"/>
   <object id="47" name="wall" x="1472" y="576" width="64" height="64"/>
@@ -287,20 +287,18 @@
   <object id="412" name="wall" x="304" y="1648" width="32" height="32"/>
   <object id="413" name="wall" x="144" y="976" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="14" name="player obj" visible="0">
+ <objectgroup id="14" name="player obj">
   <object id="867" name="player" x="592" y="336" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="15" name="door obj" visible="0">
-  <object id="944" name="door" x="768" y="640" width="64" height="64"/>
- </objectgroup>
+ <objectgroup id="15" name="door obj"/>
  <objectgroup id="12" name="zombie obj">
   <object id="906" name="zombie" x="976" y="144" width="32" height="32"/>
   <object id="947" name="zombie" x="576" y="976" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="13" name="gun obj" visible="0">
+ <objectgroup id="13" name="gun obj">
   <object id="940" name="shotgun" x="1744" y="784" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="11" name="Health obj" visible="0">
+ <objectgroup id="11" name="Health obj">
   <object id="879" name="health" x="2960" y="1424" width="32" height="32"/>
   <object id="880" name="health" x="976" y="208" width="32" height="32"/>
   <object id="881" name="health" x="336" y="1168" width="32" height="32"/>

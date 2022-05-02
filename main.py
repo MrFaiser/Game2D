@@ -16,7 +16,13 @@ from savefiles import *
 from tilemap import *
 # HUD functions
 global coins
-coins = read_file("save","COINS")
+global ammo
+try:
+    coins = read_file("save","COINS")
+    ammo = read_file("save", "pistol_ammo")
+except:
+    coins = 0
+    ammo = 0
 
 def draw_player_health(surf, x, y, pct):
     if pct < 0:
@@ -129,19 +135,22 @@ class Game:
         for snd in ZOMBIE_HIT_SOUNDS:
             self.zombie_hit_sounds.append(pg.mixer.Sound(path.join(snd_folder, snd)))
 
-        # Write Save File
-        create_file()
 
     def new(self):
+        # Write Save File
+        create_file()
         # initialize all variables and do all the setup for a new game
-        read_file("save", "CURRENT_LEVEL")
-
         self.all_sprites = pg.sprite.LayeredUpdates()
         self.walls = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
         self.bullets = pg.sprite.Group()
         self.items = pg.sprite.Group()
-        self.map = TiledMap(path.join(self.map_folder, MAPS[read_file("save", "CURRENT_LEVEL")]))
+        try:
+            self.map = TiledMap(path.join(self.map_folder, MAPS[read_file("save", "CURRENT_LEVEL")]))
+        except:
+            self.map = TiledMap(path.join(self.map_folder, "home.tmx"))
+            write_file("save","CURRENT_LEVEL", read_file("save","CURRENT_LEVEL")-1)
+
         self.map_img = self.map.make_map()
         self.map.rect = self.map_img.get_rect()
 
@@ -156,7 +165,8 @@ class Game:
                 self.mob = Mob(self, obj_center.x, obj_center.y, "zombie_strong")
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
-
+            if tile_object.name == 'door':
+                Item(self, obj_center, tile_object.name)
             if tile_object.name in ['health', "shotgun", "sniper"]:
                 Item(self, obj_center, tile_object.name)
 
@@ -166,6 +176,7 @@ class Game:
         self.night = False
         self.lvl_fin = False
         self.effects_sounds['level_start'].play()
+        self.info_update()
 
 
     def run(self):
@@ -186,11 +197,11 @@ class Game:
         pg.quit()
         sys.exit()
 
-    def coins_update(self):
+    def info_update(self):
         global coins
+        global ammo
+        ammo = read_file("save", self.player.weapon+"_ammo")
         coins = read_file("save", "COINS")
-        pass
-
 
     def update(self):
         # update portion of the game loop
@@ -205,6 +216,12 @@ class Game:
         # player hits items
         hits = pg.sprite.spritecollide(self.player, self.items, False)
         for hit in hits:
+            if hit.type == "door":
+                hit.kill()
+                self.player.weapon = "sniper"
+                self.home_completed()
+
+
             if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
                 hit.kill()
                 self.effects_sounds['health_up'].play()
@@ -217,12 +234,16 @@ class Game:
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "sniper"
+            self.info_update()
+
         # mobs hit player
+
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
             if random() < 0.7:
                 choice(self.player_hit_sounds).play()
             self.player.health -= MOBS[self.mob.type]["mob_damage"]
+            print(self.mob)
             hit.vel = vec(0, 0)
             if self.player.health <= 0:
                 self.playing = False
@@ -273,8 +294,8 @@ class Game:
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 50, align="w")
         self.draw_text("Coins: {}".format(coins), self.hud_font, 30, ORANGE, 10, 80, align="w")
-        #self.draw_text("Coins: {}".format(read_file("save", "COINS")), self.hud_font, 30, ORANGE, 10, 80, align="w")
-        self.draw_text("Weapon: {}".format(self.player.weapon), self.hud_font, 30, WHITE, 10, 110, align="w")
+        self.draw_text("Weapon: {}".format(self.player.weapon) + " - {}".format(ammo), self.hud_font, 30, DARKGREY, 10, 110, align="w")
+        self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
 
         self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHTGREY, WIDTH - 50, 10,align="center")
 
@@ -300,7 +321,7 @@ class Game:
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:
-                    self.coins_update()
+                    self.info_update()
                     write_file("save", "COINS", read_file("save","COINS")+2)
                     coins = read_file("save", "COINS")
                     print("+2 Coins")
@@ -334,7 +355,19 @@ class Game:
         pg.display.flip()
         self.wait_for_key()
         current_level = read_file("save", "CURRENT_LEVEL")
-        current_level =+ 1
+        current_level = current_level + 1
+        write_file("save", "CURRENT_LEVEL", current_level)
+
+        self.new()
+
+    def home_completed(self):
+        self.screen.fill(BLACK)
+        self.draw_text("Let's Go!", self.title_font, 100, BROWN, WIDTH / 2, HEIGHT / 2, align="center")
+        self.draw_text("Press ENTER to Fight!", self.hud_font, 75, LIGHTGREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
+        pg.display.flip()
+        self.wait_for_key()
+        current_level = read_file("save", "CURRENT_LEVEL")
+        current_level = current_level + 1
         write_file("save", "CURRENT_LEVEL", current_level)
         self.new()
 

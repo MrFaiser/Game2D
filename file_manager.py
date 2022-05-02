@@ -7,7 +7,10 @@ data = {
         {
             'NAME': "user",
             'CURRENT_LEVEL': 0,
-            'COINS': 0
+            'COINS': 0,
+            "pistol_ammo": 9999,
+            "shotgun_ammo": 0,
+            "sniper_ammo": 0
         }
     ]
 }
