@@ -170,6 +170,7 @@ class Game:
             if tile_object.name in ['health', "shotgun", "sniper"]:
                 Item(self, obj_center, tile_object.name)
 
+
         self.camera = Camera(self.map.width, self.map.height)
         self.draw_debug = False
         self.paused = False
@@ -203,6 +204,10 @@ class Game:
         ammo = read_file("save", self.player.weapon+"_ammo")
         coins = read_file("save", "COINS")
 
+    def get_ammo(self):
+        write_file("save", self.player.weapon + "_ammo",
+                   read_file("save", self.player.weapon + "_ammo") + WEAPONS[self.player.weapon]["ammo"])
+
     def update(self):
         # update portion of the game loop
         self.all_sprites.update()
@@ -220,8 +225,6 @@ class Game:
                 hit.kill()
                 self.player.weapon = "sniper"
                 self.home_completed()
-
-
             if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
                 hit.kill()
                 self.effects_sounds['health_up'].play()
@@ -230,12 +233,13 @@ class Game:
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "shotgun"
+                self.get_ammo()
             if hit.type == "sniper":
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "sniper"
+                self.get_ammo()
             self.info_update()
-
         # mobs hit player
 
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
@@ -325,7 +329,7 @@ class Game:
                     write_file("save", "COINS", read_file("save","COINS")+2)
                     coins = read_file("save", "COINS")
                     print("+2 Coins")
-
+                    self.get_ammo()
                     pass
 
 

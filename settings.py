@@ -45,13 +45,13 @@ WEAPONS['pistol'] = {'bullet_speed': 500,
                      'damage': 10,
                      'bullet_size': 'lg',
                      'bullet_count': 1,
-                     'ammo': 999}
+                     'ammo': 9}
 WEAPONS['shotgun'] = {'bullet_speed': 400,
                       'bullet_lifetime': 500,
                       'rate': 900,
                       'kickback': 300,
                       'spread': 20,
-                      'damage': 5,
+                      'damage': 50,
                       'bullet_size': 'sm',
                       'bullet_count': 12,
                       'ammo': 10}
@@ -112,7 +112,11 @@ ITEMS_LAYER = 1
 # Maps
 #CURRENT_LEVEL = 0
 MAPS = []
-MAPS = ["lvl_tut.tmx", "home.tmx", "lvl1.tmx", "lvl2.tmx"]
+MAPS = ["lvl_tut.tmx", "home.tmx",
+        "lvl1.tmx", "home.tmx",
+        "lvl2.tmx", "home.tmx",
+        "lvl3.tmx", "home.tmx",
+        ]
 
 # Items
 ITEM_IMAGES = {'health': 'health_pack.png',
