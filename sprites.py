@@ -34,7 +34,7 @@ def collide_with_walls(sprite, group, dir):
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self._layer = PLAYER_LAYER
-        self.groups = game.all_sprites
+        self.groups = game.all_sprites, game.players
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.player_img
@@ -57,27 +57,25 @@ class Player(pg.sprite.Sprite):
         snd = choice(self.game.player_step_sounds)
         if keys[pg.K_LEFT] or keys[pg.K_a]:
             self.rot_speed = PLAYER_ROT_SPEED
-            if random() < 0.04:
+            if random() < 0.008:
                 snd.play()
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.rot_speed = -PLAYER_ROT_SPEED
-            if random() < 0.04:
+            if random() < 0.08:
                 snd.play()
         if keys[pg.K_UP] or keys[pg.K_w]:
             self.vel = vec(PLAYER_SPEED, 0).rotate(-self.rot)
-            if random() < 0.08:
+            if random() < 0.016:
                 snd.play()
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.vel = vec(-PLAYER_SPEED / 2, 0).rotate(-self.rot)
-            if random() < 0.08:
+            if random() < 0.016:
                 snd.play()
         if keys[pg.K_SPACE]:
             self.shoot()
 
         if snd.get_num_channels() > 1:
             snd.stop()
-
-
 
     def shoot(self):
         now = pg.time.get_ticks()
@@ -121,7 +119,6 @@ class Player(pg.sprite.Sprite):
         collide_with_walls(self, self.game.walls, 'y')
         self.rect.center = self.hit_rect.center
 
-
     def add_health(self, amount):
         self.health += amount
         if self.health > PLAYER_HEALTH:
@@ -138,6 +135,7 @@ class Mob(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.type = type
+        self.name = type
         self.hit_rect = MOBS[self.type]["mob_hit_rect"].copy()
         self.hit_rect.center = self.rect.center
         self.pos = vec(x, y)
@@ -160,7 +158,7 @@ class Mob(pg.sprite.Sprite):
     def update(self):
         target_dist = self.target.pos - self.pos
         if target_dist.length_squared() < MOBS[self.type]["detect_radius"]**2:
-            if random() < 0.02:
+            if random() < 0.008:
                 choice(self.game.zombie_moan_sounds).play()
             self.rot = target_dist.angle_to(vec(1, 0))
             self.image = pg.transform.rotate(self.game.mob_img[self.type], self.rot)
