@@ -2,11 +2,12 @@
     "save": [
         {
             "NAME": "user",
-            "CURRENT_LEVEL": 1,
-            "COINS": 95,
-            "pistol_ammo": 0,
-            "shotgun_ammo": 29,
-            "sniper_ammo": 4
+            "CURRENT_LEVEL": 4,
+            "COINS": 348,
+            "pistol_ammo": 1459,
+            "shotgun_ammo": 46,
+            "sniper_ammo": 43,
+            "rifle_ammo": 282
         }
     ]
 }

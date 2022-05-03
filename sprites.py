@@ -54,16 +54,30 @@ class Player(pg.sprite.Sprite):
         self.rot_speed = 0
         self.vel = vec(0, 0)
         keys = pg.key.get_pressed()
+        snd = choice(self.game.player_step_sounds)
         if keys[pg.K_LEFT] or keys[pg.K_a]:
             self.rot_speed = PLAYER_ROT_SPEED
+            if random() < 0.04:
+                snd.play()
         if keys[pg.K_RIGHT] or keys[pg.K_d]:
             self.rot_speed = -PLAYER_ROT_SPEED
+            if random() < 0.04:
+                snd.play()
         if keys[pg.K_UP] or keys[pg.K_w]:
             self.vel = vec(PLAYER_SPEED, 0).rotate(-self.rot)
+            if random() < 0.08:
+                snd.play()
         if keys[pg.K_DOWN] or keys[pg.K_s]:
             self.vel = vec(-PLAYER_SPEED / 2, 0).rotate(-self.rot)
+            if random() < 0.08:
+                snd.play()
         if keys[pg.K_SPACE]:
             self.shoot()
+
+        if snd.get_num_channels() > 1:
+            snd.stop()
+
+
 
     def shoot(self):
         now = pg.time.get_ticks()
@@ -170,6 +184,7 @@ class Mob(pg.sprite.Sprite):
             self.kill()
             self.game.map_img.blit(self.game.splat, self.pos - vec(32, 32))
             write_file("save", "COINS", read_file("save", "COINS") + MOBS[self.type]["coin_reward"])
+            print(self.type)
             self.game.info_update()
 
     def draw_health(self):

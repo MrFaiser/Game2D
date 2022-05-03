@@ -10,7 +10,9 @@ data = {
             'COINS': 0,
             "pistol_ammo": 25,
             "shotgun_ammo": -1,
-            "sniper_ammo": -1
+            "sniper_ammo": -1,
+            "rifle_ammo": -1
+
         }
     ]
 }

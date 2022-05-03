@@ -1,7 +1,7 @@
 import json
 import time
 from pathlib import Path
-
+from datetime import datetime
 import pygame as pg
 import sys
 from random import choice, random
@@ -134,6 +134,9 @@ class Game:
         self.player_hit_sounds = []
         for snd in PLAYER_HIT_SOUNDS:
             self.player_hit_sounds.append(pg.mixer.Sound(path.join(snd_folder, snd)))
+        self.player_step_sounds = []
+        for snd in PLAYER_STEP_SOUNDS:
+            self.player_step_sounds.append(pg.mixer.Sound(path.join(snd_folder, snd)))
         self.zombie_hit_sounds = []
         for snd in ZOMBIE_HIT_SOUNDS:
             self.zombie_hit_sounds.append(pg.mixer.Sound(path.join(snd_folder, snd)))
@@ -170,7 +173,7 @@ class Game:
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
             if tile_object.name == 'door':
                 Item(self, obj_center, tile_object.name)
-            if tile_object.name in ['health', "shotgun", "sniper"]:
+            if tile_object.name in ITEM_LIST:
                 Item(self, obj_center, tile_object.name)
 
 
@@ -188,11 +191,35 @@ class Game:
         # game loop - set self.playing = False to end the game
         self.playing = True
         pg.mixer.music.play(loops=-1)
+        time_start = time.time()
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000.0  # fix for Python 2.x
             self.events()
             if not self.paused:
                 self.update()
+                #Start loop Item Respawn
+                time_now = time.time()
+                if (time_now - time_start) >= ITEM_RESPAWN_TIME:
+                    time_start = time.time()
+                    hits = self.items
+                    for hit in hits:
+                        if hit.type == "health":
+                            hit.kill()
+                        elif hit.type == "pistol":
+                            hit.kill()
+                        elif hit.type == "shotgun":
+                            hit.kill()
+                        elif hit.type == "sniper":
+                            hit.kill()
+                        elif hit.type == "rifle":
+                            hit.kill()
+
+                    for tile_object in self.map.tmxdata.objects:
+                        obj_center = vec(tile_object.x + tile_object.width / 2,
+                                         tile_object.y + tile_object.height / 2)
+                        if tile_object.name in ITEM_LIST:
+                            Item(self, obj_center, tile_object.name)
+                #Loop End Item Respawn
             self.draw()
             if self.lvl_fin:
                 self.lvl_completed()
@@ -233,6 +260,11 @@ class Game:
                 hit.kill()
                 self.effects_sounds['health_up'].play()
                 self.player.add_health(HEALTH_PACK_AMOUNT)
+            if hit.type == "pistol":
+                hit.kill()
+                self.effects_sounds["gun_pickup"].play()
+                self.player.weapon = "pistol"
+                self.get_ammo()
             if hit.type == "shotgun":
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
@@ -243,15 +275,24 @@ class Game:
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "sniper"
                 self.get_ammo()
+            if hit.type == "rifle":
+                hit.kill()
+                self.effects_sounds["gun_pickup"].play()
+                self.player.weapon = "rifle"
+                self.get_ammo()
+
             self.info_update()
         # mobs hit player
-
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         for hit in hits:
+            ##############################
+            print(hits)
+            print(hit)
+
+            ##############################
             if random() < 0.7:
                 choice(self.player_hit_sounds).play()
             self.player.health -= MOBS[self.mob.type]["mob_damage"]
-            print(self.mob)
             hit.vel = vec(0, 0)
             if self.player.health <= 0:
                 self.playing = False
@@ -264,6 +305,7 @@ class Game:
             #hit.health -= WEAPONS[self.player.weapon]['damage'] * len(hits[hit])
             for bullet in hits[mob]:
                 mob.health -= bullet.damage
+                print(mob.type)
             mob.vel = vec(0, 0)
 
     def draw_grid(self):
@@ -303,7 +345,7 @@ class Game:
         self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 50, align="w")
         self.draw_text("Coins: {}".format(coins), self.hud_font, 30, ORANGE, 10, 80, align="w")
         self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(ammo), self.hud_font, 30, DARKGREY, 10, 110, align="w")
-        self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
+     #   self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
 
         self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHTGREY, WIDTH - 50, 10,align="center")
 
@@ -334,6 +376,7 @@ class Game:
                     coins = read_file("save", "COINS")
                     print("+2 Coins")
                     self.get_ammo()
+                    self.player.health = 1000
                 if event.key == pg.K_1:
                     if read_file("save", "pistol_ammo") >= 0:
                         self.player.weapon = "pistol"
@@ -347,6 +390,8 @@ class Game:
                         self.player.weapon = "sniper"
                     pass
                 if event.key == pg.K_4:
+                    if read_file("save", "rifle_ammo") >= 0:
+                        self.player.weapon = "rifle"
                     pass
                 if event.key == pg.K_5:
                     pass
@@ -415,6 +460,7 @@ class Game:
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_RETURN or event.key == pg.K_KP_ENTER:
                         waiting = False
+
 
 # create the game object
 g = Game()

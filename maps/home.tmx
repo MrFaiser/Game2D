@@ -205,7 +205,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="7" name="wall obj" locked="1">
+ <objectgroup id="7" name="wall obj" visible="0" locked="1">
   <object id="5" name="wall" x="768" y="320" width="64" height="320"/>
   <object id="8" name="wall" x="832" y="320" width="1280" height="64"/>
   <object id="9" name="wall" x="1600" y="384" width="64" height="512"/>
@@ -292,21 +292,11 @@
  <objectgroup id="15" name="door obj">
   <object id="944" name="door" x="704" y="640" width="64" height="64"/>
  </objectgroup>
- <objectgroup id="12" name="zombie obj"/>
- <objectgroup id="13" name="gun obj">
+ <objectgroup id="12" name="zombie obj" visible="0"/>
+ <objectgroup id="13" name="gun obj" visible="0">
   <object id="940" name="shotgun" x="1744" y="784" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="11" name="Health obj">
-  <object id="879" name="health" x="2960" y="1424" width="32" height="32"/>
-  <object id="880" name="health" x="976" y="208" width="32" height="32"/>
-  <object id="881" name="health" x="336" y="1168" width="32" height="32"/>
   <object id="882" name="health" x="960" y="1088" width="192" height="64"/>
-  <object id="883" name="health" x="912" y="1488" width="32" height="32"/>
-  <object id="884" name="health" x="464" y="1488" width="32" height="32"/>
-  <object id="885" name="health" x="1488" y="1424" width="32" height="32"/>
-  <object id="886" name="health" x="2320" y="464" width="32" height="32"/>
-  <object id="887" name="health" x="2256" y="720" width="32" height="32"/>
-  <object id="888" name="health" x="2768" y="592" width="32" height="32"/>
-  <object id="889" name="health" x="2192" y="1360" width="32" height="32"/>
  </objectgroup>
 </map>
