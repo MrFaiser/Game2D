@@ -113,6 +113,9 @@ class Game:
         self.light_rect = self.light_mask.get_rect()
         # Sound loading
         pg.mixer.music.load(path.join(music_folder, BG_MUSIC))
+        pg.mixer.music.set_volume(0.5)
+
+
         self.effects_sounds = {}
         for type in EFFECTS_SOUNDS:
             self.effects_sounds[type] = pg.mixer.Sound(path.join(snd_folder, EFFECTS_SOUNDS[type]))
@@ -178,6 +181,7 @@ class Game:
         self.lvl_fin = False
         self.effects_sounds['level_start'].play()
         self.info_update()
+
 
 
     def run(self):
@@ -298,7 +302,7 @@ class Game:
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 50, align="w")
         self.draw_text("Coins: {}".format(coins), self.hud_font, 30, ORANGE, 10, 80, align="w")
-        self.draw_text("Weapon: {}".format(self.player.weapon) + " - {}".format(ammo), self.hud_font, 30, DARKGREY, 10, 110, align="w")
+        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(ammo), self.hud_font, 30, DARKGREY, 10, 110, align="w")
         self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
 
         self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHTGREY, WIDTH - 50, 10,align="center")
@@ -330,7 +334,31 @@ class Game:
                     coins = read_file("save", "COINS")
                     print("+2 Coins")
                     self.get_ammo()
+                if event.key == pg.K_1:
+                    if read_file("save", "pistol_ammo") >= 0:
+                        self.player.weapon = "pistol"
                     pass
+                if event.key == pg.K_2:
+                    if read_file("save", "shotgun_ammo") >= 0:
+                        self.player.weapon = "shotgun"
+                    pass
+                if event.key == pg.K_3:
+                    if read_file("save", "sniper_ammo") >= 0:
+                        self.player.weapon = "sniper"
+                    pass
+                if event.key == pg.K_4:
+                    pass
+                if event.key == pg.K_5:
+                    pass
+                if event.key == pg.K_6:
+                    pass
+                if event.key == pg.K_7:
+                    pass
+                if event.key == pg.K_8:
+                    pass
+                if event.key == pg.K_9:
+                    pass
+                self.info_update()
 
 
 
