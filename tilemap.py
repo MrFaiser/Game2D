@@ -52,10 +52,22 @@ class Camera:
     def apply_rect(self, rect):
         return rect.move(self.camera.topleft)
 
-    def update(self, target):
+    def get_pos(self, target):
         x = -target.rect.centerx + int(WIDTH / 2)
         y = -target.rect.centery + int(HEIGHT / 2)
 
+        # limit scrolling to map size
+        x = min(0, x)  # left
+        y = min(0, y)  # top
+        x = max(-(self.width - WIDTH), x)  # right
+        y = max(-(self.height - HEIGHT), y)  # bottom
+        self.camera = pg.Rect(x, y, self.width, self.height)
+        return x
+
+
+    def update(self, target):
+        x = -target.rect.centerx + int(WIDTH / 2)
+        y = -target.rect.centery + int(HEIGHT / 2)
         # limit scrolling to map size
         x = min(0, x)  # left
         y = min(0, y)  # top

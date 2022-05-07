@@ -205,7 +205,7 @@
 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 </data>
  </layer>
- <objectgroup id="7" name="wall obj" locked="1">
+ <objectgroup id="7" name="wall obj">
   <object id="5" name="wall" x="768" y="320" width="64" height="320"/>
   <object id="8" name="wall" x="832" y="320" width="960" height="64"/>
   <object id="9" name="wall" x="1600" y="384" width="64" height="512"/>
@@ -224,9 +224,9 @@
   <object id="53" name="wall" x="464" y="272" width="32" height="32"/>
   <object id="54" name="wall" x="304" y="112" width="32" height="32"/>
   <object id="55" name="wall" x="208" y="400" width="32" height="32"/>
-  <object id="162" name="wall" x="0" y="0" width="3200" height="16"/>
+  <object id="162" name="wall" x="0" y="0" width="3200" height="32"/>
   <object id="163" name="wall" x="0" y="1904" width="3200" height="16"/>
-  <object id="164" name="wall" x="0" y="16" width="16" height="1888"/>
+  <object id="164" name="wall" x="0" y="16" width="32" height="1888"/>
   <object id="165" name="wall" x="3184" y="16" width="16" height="1888"/>
   <object id="166" name="wall" x="2752" y="64" width="128" height="192"/>
   <object id="167" name="wall" x="2880" y="192" width="64" height="64"/>

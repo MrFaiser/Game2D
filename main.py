@@ -43,6 +43,26 @@ def draw_player_health(surf, x, y, pct):
     pg.draw.rect(surf, col, fill_rect)
     pg.draw.rect(surf, WHITE, outline_rect, 2)
 
+def draw_line(surf, x, y,pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 150
+    BAR_HEIGHT = 20
+    fill = pct * BAR_LENGTH
+    outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    if pct >= 0.8:
+        col = BLUE
+    elif pct >= 0.5:
+        col = YELLOW
+    elif pct >= 0.3:
+        col = ORANGE
+    else:
+        col = RED
+    pg.draw.rect(surf, col, fill_rect)
+    pg.draw.rect(surf, WHITE, outline_rect, 2)
+
+
 class Game:
     def __init__(self):
         pg.mixer.pre_init(44100, -16, 4, 2048)
@@ -196,7 +216,6 @@ class Game:
         self.info_update()
 
 
-
     def run(self):
         # game loop - set self.playing = False to end the game
         self.playing = True
@@ -230,7 +249,30 @@ class Game:
                         if tile_object.name in ITEM_LIST:
                             Item(self, obj_center, tile_object.name)
                 #Loop End Item Respawn
+
+            #experiment start
+             # draw_line(self.screen, HEIGHT/2, 10, 100)
+
+            # pg.draw.lines(pg.display.get_surface(), PINK, True,[[self.allmob.pos.x, self.mob.pos.y],
+ #                                                               [self.player.pos.x, self.player.pos.y]], 10)
+
+            pg.display.flip()
+
+            #w = self.map.tmxdata.width
+            #h = self.map.tmxdata.height
+            #self.height = tm.height * tm.tileheight
+
+            #temp_surface = pg.Surface((w, h))
+
+           # pg.draw.line(temp_surface, CYAN, self.player.pos, [500, 300], 10)
+#            pg.draw.lines(pg.display.get_surface(), PINK, False, [[0, 0], [500, 300]], 10)
+            # draw_line(self.screen, 20, 10, self.player.health / PLAYER_HEALTH)
+
+
+
+            #experiment ende
             self.draw()
+
             if self.lvl_fin:
                 self.lvl_completed()
 
@@ -296,15 +338,9 @@ class Game:
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         zombie_type = ""
         for hit in hits:
-            #########################################################################
-            # bullets hit mobs
             hits = pg.sprite.groupcollide(self.mobs, self.players, False, False)
             for mob in hits:
-                print("+++")
                 zombie_type = mob.type
-                print(zombie_type)
-                print("+++")
-            #########################################################################
 
             if random() < 0.4:
                 choice(self.player_hit_sounds).play()
@@ -314,25 +350,20 @@ class Game:
                 self.playing = False
         if hits:
             self.player.hit()
-#            self.player.pos += vec(0,MOBS[zombie_type]["mob_knockback"])#.rotate(self.player.rot)#rotate(-hits[0].rot)
             self.player.pos += vec(MOBS[zombie_type]["mob_knockback"],0).rotate(-self.player.rot+180)
-#            self.player.pos = vec(-MOBS[zombie_type]["mob_knockback"]).rotate(-self.player.rot)
-#            self.vel = vec(PLAYER_SPEED, 0).rotate(-self.player.rot)
-            print()
-
+#
         # bullets hit mobs
         hits = pg.sprite.groupcollide(self.mobs, self.bullets, False, True)
         for mob in hits:
             for bullet in hits[mob]:
                 mob.health -= bullet.damage
-                print(mob.type)
             mob.vel = vec(0, 0)
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (x, 0), (x, HEIGHT))
+            pg.draw.line(self.screen, LIGHT_GREY, (x, 0), (x, HEIGHT))
         for y in range(0, HEIGHT, TILESIZE):
-            pg.draw.line(self.screen, LIGHTGREY, (0, y), (WIDTH, y))
+            pg.draw.line(self.screen, LIGHT_GREY, (0, y), (WIDTH, y))
 
     def render_fog(self):
         self.fog.fill(NIGHT_COLOR)
@@ -340,17 +371,49 @@ class Game:
         self.fog.blit(self.light_mask, self.light_rect)
         self.screen.blit(self.fog, (0, 0), special_flags=pg.BLEND_MULT)
 
+
     def draw(self):
         pg.display.set_caption("{:.2f}".format(self.clock.get_fps()))
         # self.screen.fill(BGCOLOR)
         self.screen.blit(self.map_img, self.camera.apply(self.map))
         # self.draw_grid()
+        dist_all = []
         for sprite in self.all_sprites:
             if isinstance(sprite, Mob):
                 sprite.draw_health()
             self.screen.blit(sprite.image, self.camera.apply(sprite))
             if self.draw_debug:
                 pg.draw.rect(self.screen, CYAN, self.camera.apply_rect(sprite.hit_rect), 1)
+###########################
+                if sprite.type == "zombie" or sprite.type == "zombie_strong":
+                    dist = self.player.pos - sprite.pos
+                    dist_all.append(dist.length())
+                    dist_all.sort()
+                    s = False
+                    if s == True:
+                        pg.draw.line(self.screen, ORANGE, self.camera.apply(self.player).center,
+                             self.camera.apply(sprite).center, 2)
+                        print("##################### TRUE #########")
+        compas_level = 4
+        for sprite in self.all_sprites:
+            if self.draw_debug:
+                #if sprite.type == "zombie" or sprite.type == "zombie_strong":
+                    dist = self.player.pos - sprite.pos
+                    for k in range(compas_level):
+                        try:
+                            if dist.length() == dist_all[k]:
+                                if sprite.type == "zombie":
+                                    pg.draw.line(self.screen, ORANGE, self.camera.apply(self.player).center,
+                                             self.camera.apply(sprite).center, 2)
+                                elif sprite.type == "zombie_strong":
+                                    pg.draw.line(self.screen, RED, self.camera.apply(self.player).center,
+                                             self.camera.apply(sprite).center, 2)
+
+                        except:
+                            pass
+
+
+###########################
         if self.draw_debug:
             for wall in self.walls:
                 pg.draw.rect(self.screen, CYAN, self.camera.apply_rect(wall.rect), 1)
@@ -364,10 +427,10 @@ class Game:
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 50, align="w")
         self.draw_text("Coins: {}".format(coins), self.hud_font, 30, ORANGE, 10, 80, align="w")
-        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(ammo), self.hud_font, 30, DARKGREY, 10, 110, align="w")
+        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(ammo), self.hud_font, 30, DARK_GREY, 10, 110, align="w")
      #   self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
 
-        self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHTGREY, WIDTH - 50, 10,align="center")
+        self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHT_GREY, WIDTH - 50, 10,align="center")
 
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
@@ -430,7 +493,7 @@ class Game:
     def show_start_screen(self):
         self.screen.fill(BLACK)
         self.draw_text("START GAME", self.title_font, 100, YELLOW, WIDTH / 2, HEIGHT / 2, align="center")
-        self.draw_text("Press ENTER to start", self.hud_font, 75, LIGHTGREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
+        self.draw_text("Press ENTER to start", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
 
         pg.display.flip()
         self.wait_for_key()
@@ -438,7 +501,7 @@ class Game:
     def show_go_screen(self):
         self.screen.fill(BLACK)
         self.draw_text("GAME OVER", self.title_font, 100, RED, WIDTH/2, HEIGHT/2, align="center")
-        self.draw_text("Press ENTER to start", self.hud_font, 75, LIGHTGREY, WIDTH/2, HEIGHT*3/4, align="center")
+        self.draw_text("Press ENTER to start", self.hud_font, 75, LIGHT_GREY, WIDTH/2, HEIGHT*3/4, align="center")
 
         pg.display.flip()
         self.wait_for_key()
@@ -446,7 +509,7 @@ class Game:
     def lvl_completed(self):
         self.screen.fill(BLACK)
         self.draw_text("LEVEL DONE", self.title_font, 100, GREEN, WIDTH / 2, HEIGHT / 2, align="center")
-        self.draw_text("Press ENTER to go Home", self.hud_font, 75, LIGHTGREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
+        self.draw_text("Press ENTER to go Home", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
 
 
         pg.display.flip()
@@ -460,7 +523,7 @@ class Game:
     def home_completed(self):
         self.screen.fill(BLACK)
         self.draw_text("Let's Go!", self.title_font, 100, BROWN, WIDTH / 2, HEIGHT / 2, align="center")
-        self.draw_text("Press ENTER to Fight!", self.hud_font, 75, LIGHTGREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
+        self.draw_text("Press ENTER to Fight!", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
         pg.display.flip()
         self.wait_for_key()
         current_level = read_file("save", "CURRENT_LEVEL")

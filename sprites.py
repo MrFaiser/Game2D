@@ -1,4 +1,6 @@
+import pygame
 import pygame as pg
+import math
 from random import uniform, choice, randint, random
 from settings import *
 from tilemap import collide_hit_rect
@@ -36,6 +38,7 @@ class Player(pg.sprite.Sprite):
         self._layer = PLAYER_LAYER
         self.groups = game.all_sprites, game.players
         pg.sprite.Sprite.__init__(self, self.groups)
+        self.type = "player"
         self.game = game
         self.image = game.player_img
         self.rect = self.image.get_rect()
@@ -158,6 +161,7 @@ class Mob(pg.sprite.Sprite):
     def update(self):
         target_dist = self.target.pos - self.pos
         if target_dist.length_squared() < MOBS[self.type]["detect_radius"]**2:
+
             if random() < 0.008:
                 choice(self.game.zombie_moan_sounds).play()
             self.rot = target_dist.angle_to(vec(1, 0))
@@ -176,13 +180,17 @@ class Mob(pg.sprite.Sprite):
             collide_with_walls(self, self.game.walls, 'y')
             self.rect.center = self.hit_rect.center
 
+ #           if self.pos.x >= WIDTH:
+#                print(self.pos.x-WIDTH)
 
+#            print(self.pos.x)
+
+           #pg.draw
         if self.health <= 0:
             choice(self.game.zombie_hit_sounds).play()
             self.kill()
             self.game.map_img.blit(self.game.splat, self.pos - vec(32, 32))
             write_file("save", "COINS", read_file("save", "COINS") + MOBS[self.type]["coin_reward"])
-            print(self.type)
             self.game.info_update()
 
     def draw_health(self):
@@ -204,6 +212,7 @@ class Bullet(pg.sprite.Sprite):
         self._layer = BULLET_LAYER
         self.groups = game.all_sprites, game.bullets
         pg.sprite.Sprite.__init__(self, self.groups)
+        self.type = "bullet"
         self.game = game
         self.image = game.bullet_images[WEAPONS[game.player.weapon]['bullet_size']]
         self.rect = self.image.get_rect()
@@ -228,6 +237,7 @@ class Obstacle(pg.sprite.Sprite):
         self.groups = game.walls
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.type = "obstacle"
         self.rect = pg.Rect(x, y, w, h)
         self.hit_rect = self.rect
         self.x = x
@@ -241,9 +251,11 @@ class MuzzleFlash(pg.sprite.Sprite):
         self.groups = game.all_sprites
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
+        self.type = "muzzle"
         size = randint(20, 50)
         self.image = pg.transform.scale(choice(game.gun_flashes), (size, size))
         self.rect = self.image.get_rect()
+        self.hit_rect = self.rect
         self.pos = pos
         self.rect.center = pos
         self.spawn_time = pg.time.get_ticks()
@@ -260,6 +272,7 @@ class Item(pg.sprite.Sprite):
         self.game = game
         self.image = game.item_images[type]
         self.rect = self.image.get_rect()
+        self.hit_rect = self.rect
         self.type = type
         self.pos = pos
         self.rect.center = pos

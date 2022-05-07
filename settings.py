@@ -4,32 +4,33 @@ vec = pg.math.Vector2
 # define some colors (R, G, B)
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-DARKGREY = (40, 40, 40)
-LIGHTGREY = (100, 100, 100)
+DARK_GREY = (40, 40, 40)
+LIGHT_GREY = (100, 100, 100)
 GREEN = (0, 255, 0)
 DARK_GREEN = (0, 100, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
+BLUE = (0, 0, 255)
 BROWN = (106, 55, 5)
 ORANGE = (255, 136, 0)
 CYAN = (0, 255, 255)
-
+PINK = (255,105,180)
 
 # game settings
-WIDTH = 1024   # 16 * 64 or 32 * 32 or 64 * 16
-HEIGHT = 768  # 16 * 48 or 32 * 24 or 64 * 12
+WIDTH = 1000   # 16 * 64 or 32 * 32 or 64 * 16
+HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
 FPS = 60
 TITLE = "Tilemap Demo"
 BGCOLOR = BROWN
 
-TILESIZE = 64
+TILESIZE = 62
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
 # Player settings
-PLAYER_HEALTH = 100
-PLAYER_SPEED = 280
-PLAYER_ROT_SPEED = 200
+PLAYER_HEALTH = 1000
+PLAYER_SPEED = 880
+PLAYER_ROT_SPEED = 400
 PLAYER_IMG = 'manBlue_gun.png'
 PLAYER_HIT_RECT = pg.Rect(0, 0, 35, 35)
 BARREL_OFFSET = vec(30, 10)
@@ -80,8 +81,8 @@ MOBS["zombie"] = {"mob_img": "zombie1_hold.png",
                   "mob_speed": [150, 100, 75, 125],
                   "mob_hit_rect": pg.Rect(0, 0, 30, 30),
                   "mob_health": 100,
-                  "mob_damage": 1,
-                  "mob_knockback": 10,
+                  "mob_damage": 8,
+                  "mob_knockback": 20,
                   "avoid_radius":20,
                   "detect_radius":400,
                   "coin_reward":1}
@@ -90,8 +91,8 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "mob_speed": [200, 10],
                   "mob_hit_rect": pg.Rect(0, 0, 30, 30),
                   "mob_health": 400,
-                  "mob_damage": 12,
-                  "mob_knockback": 80,
+                  "mob_damage": 20,
+                  "mob_knockback": 40,
                   "avoid_radius":20,
                   "detect_radius":200,
                   "coin_reward": 2}
