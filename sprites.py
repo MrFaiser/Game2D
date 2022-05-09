@@ -4,12 +4,12 @@ import math
 from random import uniform, choice, randint, random
 from settings import *
 from tilemap import collide_hit_rect
+import pytweening
 import pytweening as tween
 from itertools import chain
 from file_manager import *
 
 vec = pg.math.Vector2
-
 
 def collide_with_walls(sprite, group, dir):
     if dir == 'x':
