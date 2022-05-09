@@ -3,11 +3,12 @@
         {
             "NAME": "user",
             "CURRENT_LEVEL": 0,
-            "COINS": 0,
-            "pistol_ammo": 25,
-            "shotgun_ammo": -1,
-            "sniper_ammo": -1,
-            "rifle_ammo": -1,
+            "COINS": 62,
+            "pistol_ammo": 23330,
+            "shotgun_ammo": 44451,
+            "sniper_ammo": 434318,
+            "rifle_ammo": 2342319,
+            "laser_ammo": 2341236,
             "compas_lvl": 0,
             "compas_all": false
         }

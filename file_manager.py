@@ -12,6 +12,7 @@ data = {
             "shotgun_ammo": -1,
             "sniper_ammo": -1,
             "rifle_ammo": -1,
+            "laser_ammo": -1,
             "compas_lvl": 0,
             "compas_all": False
 

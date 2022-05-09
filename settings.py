@@ -74,6 +74,15 @@ WEAPONS['rifle'] = {'bullet_speed': 600,
                       'bullet_size': 'lg',
                       'bullet_count': 1,
                       'ammo': 35}
+WEAPONS['laser'] = {'bullet_speed': 1000,
+                      'bullet_lifetime': 20000,
+                      'rate': 5,
+                      'kickback': 0,
+                      'spread': 1,
+                      'damage': 200,
+                      'bullet_size': 'sm',
+                      'bullet_count': 2,
+                      'ammo': 1000}
 
 # Mob settings
 MOBS = {}
@@ -122,10 +131,11 @@ ITEMS_LAYER = 1
 # Maps
 #CURRENT_LEVEL = 0
 MAPS = []
-MAPS = ["lvl_tut.tmx", "home.tmx",
-        "lvl1.tmx", "home.tmx",
-        "lvl2.tmx", "home.tmx",
-        "lvl3.tmx", "home.tmx",
+MAPS = ["lvl_tut.tmx",
+        "lvl1.tmx",
+        "lvl2.tmx",
+        "lvl3.tmx",
+        "lvl4.tmx",
         ]
 
 # Items
@@ -135,7 +145,8 @@ ITEM_IMAGES = {'health': 'health_pack.png',
                "pistol": "pistol.png",
                "shotgun": "shotgun.png",
                "sniper": "sniper.png",
-               "rifle": "rifle.png"}
+               "rifle": "rifle.png",
+               "laser": "laser.png"}
 # Levels
 LVL_LIST = []
 LVL_LIST= ["door_auto", "doorlvl1","doorlvl2"]
@@ -146,7 +157,7 @@ LVL_IMAGES = {'door_auto': 'door_enter.png',
 
 
 HEALTH_PACK_AMOUNT = 20
-ITEM_RESPAWN_TIME = 3*60
+ITEM_RESPAWN_TIME = 5# 3*60
 BOB_RANGE = 15
 BOB_SPEED = 0.1
 
@@ -163,7 +174,8 @@ ZOMBIE_HIT_SOUNDS = ['splat-15.wav']
 WEAPON_SOUNDS = {'pistol': ['pistol.wav'],
                  'shotgun': ['shotgun.wav'],
                  'sniper': ['shotgun.wav'],
-                 'rifle': ['pistol.wav']
+                 'rifle': ['pistol.wav'],
+                 'laser': ['pistol.wav']
                  }
 
 EFFECTS_SOUNDS = {'level_start': 'level_start.wav',

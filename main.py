@@ -117,7 +117,9 @@ class Game:
         self.ammo = read_file("save", "pistol_ammo")
         self.compas_lvl = read_file("save", "compas_lvl")
         self.compas_all = read_file("save", "compas_all")
+        self.current_level = read_file("save", "CURRENT_LEVEL")
         #Player Stats End
+
 
 
         self.splat = pg.image.load(path.join(img_folder, SPLAT)).convert_alpha()
@@ -191,7 +193,8 @@ class Game:
             self.map = TiledMap(path.join(self.map_folder, level))
         except:
             self.map = TiledMap(path.join(self.map_folder, "home.tmx"))
-            write_file("save","CURRENT_LEVEL", read_file("save","CURRENT_LEVEL")-1)
+            print("enter home")
+            #write_file("save","CURRENT_LEVEL", self.current_level-1)
 
         self.map_img = self.map.make_map()
         self.map.rect = self.map_img.get_rect()
@@ -219,6 +222,7 @@ class Game:
         self.night = False
         self.lvl_fin = False
         self.compas_is_used = False
+        self.level_selectet = False
         self.effects_sounds['level_start'].play().set_volume(0.2)
         self.info_update()
 
@@ -238,16 +242,9 @@ class Game:
                 if (time_now - time_start) >= ITEM_RESPAWN_TIME:
                     time_start = time.time()
                     hits = self.items
+
                     for hit in hits:
-                        if hit.type == "health":
-                            hit.kill()
-                        elif hit.type == "pistol":
-                            hit.kill()
-                        elif hit.type == "shotgun":
-                            hit.kill()
-                        elif hit.type == "sniper":
-                            hit.kill()
-                        elif hit.type == "rifle":
+                        for item in ITEM_LIST:
                             hit.kill()
 
                     for tile_object in self.map.tmxdata.objects:
@@ -293,11 +290,13 @@ class Game:
                 hit.kill()
                 self.home_completed()
             elif hit.type == "doorlvl1":
-                hit.kill()
-                self.enter_level_from_home("lvl1.tmx")
+                if read_file("save", "CURRENT_LEVEL") >= 1:
+                    hit.kill()
+                    self.enter_level_from_home("lvl1.tmx")
             elif hit.type == "doorlvl2":
-                hit.kill()
-                self.enter_level_from_home("lvl2.tmx")
+                if read_file("save", "CURRENT_LEVEL") >= 2:
+                    hit.kill()
+                    self.enter_level_from_home("lvl2.tmx")
 
 
             if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
@@ -439,7 +438,6 @@ class Game:
 
     def events(self):
         # catch all events here
-        global coins
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
@@ -476,9 +474,11 @@ class Game:
                         self.player.weapon = "rifle"
                     pass
                 if event.key == pg.K_5:
-                   self.compas_is_used = not self.compas_is_used
-                if event.key == pg.K_6:
+                    if read_file("save", "laser_ammo") >= 0:
+                        self.player.weapon = "laser"
                     pass
+                if event.key == pg.K_6:
+                    self.compas_is_used = not self.compas_is_used
                 if event.key == pg.K_7:
                     pass
                 if event.key == pg.K_8:
@@ -494,8 +494,6 @@ class Game:
         self.draw_text("START GAME", self.title_font, 100, YELLOW, WIDTH / 2, HEIGHT / 2, align="center")
         self.draw_text("Press ENTER to start", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
 
-
-
         pg.display.flip()
         self.wait_for_key()
 
@@ -505,19 +503,20 @@ class Game:
         self.draw_text("Press ENTER to start", self.hud_font, 75, LIGHT_GREY, WIDTH/2, HEIGHT*3/4, align="center")
 
         pg.display.flip()
+
         self.wait_for_key()
+        self.new("home.tmx")
 
     def lvl_completed(self):
         self.screen.fill(BLACK)
         self.draw_text("LEVEL DONE", self.title_font, 100, GREEN, WIDTH / 2, HEIGHT / 2, align="center")
         self.draw_text("Press ENTER to go Home", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
 
-
         pg.display.flip()
         self.wait_for_key()
-        current_level = read_file("save", "CURRENT_LEVEL")
-        current_level = current_level + 1
-        write_file("save", "CURRENT_LEVEL", current_level)
+        if not self.level_selectet:
+            self.current_level = read_file("save", "CURRENT_LEVEL") + 1
+            write_file("save", "CURRENT_LEVEL", self.current_level)
 
         self.new("home.tmx")
 
@@ -530,24 +529,23 @@ class Game:
 
         pg.display.flip()
         self.wait_for_key()
-        current_level = read_file("save", "CURRENT_LEVEL")
-        current_level = current_level + 1
-        write_file("save", "CURRENT_LEVEL", current_level)
-        self.new(MAPS[read_file("save", "CURRENT_LEVEL")])
+
+        try:
+            self.new(MAPS[read_file("save", "CURRENT_LEVEL") + 1])
+        except:
+            self.new("home.tmx")
 
     def enter_level_from_home(self, level):
         self.screen.fill(DARK_GREY)
-        self.draw_text("Let's Go!" + str(level), self.title_font, 100, BROWN, WIDTH / 2, HEIGHT / 2, align="center")
+        self.draw_text("Let's Go!", self.title_font, 100, BROWN, WIDTH / 2, HEIGHT / 2, align="center")
         self.draw_text("Press ENTER to Fight!", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
         self.compas_lvl = read_file("save", "compas_lvl")
         self.compas_all = read_file("save", "compas_all")
 
         pg.display.flip()
         self.wait_for_key()
-        self.map = TiledMap(path.join(self.map_folder, level))
         self.new(level)
-
-
+        self.level_selectet = not self.level_selectet
 
     def wait_for_key(self):
         pg.event.wait()
