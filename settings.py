@@ -28,9 +28,9 @@ GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
 # Player settings
-PLAYER_HEALTH = 1000
-PLAYER_SPEED = 880
-PLAYER_ROT_SPEED = 400
+PLAYER_HEALTH = 100
+PLAYER_SPEED =280
+PLAYER_ROT_SPEED = 200
 PLAYER_IMG = 'manBlue_gun.png'
 PLAYER_HIT_RECT = pg.Rect(0, 0, 35, 35)
 BARREL_OFFSET = vec(30, 10)
@@ -102,7 +102,7 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
 # Effects
 MUZZLE_FLASHES = ['whitePuff15.png', 'whitePuff16.png', 'whitePuff17.png',
                   'whitePuff18.png']
-SPLAT = 'whitePuff16 - Kopie.png'
+SPLAT = 'blood_splat.png'
 FLASH_DURATION = 50
 DAMAGE_ALPHA = [i for i in range(0, 255, 55)]
 NIGHT_COLOR = (30, 30, 30)
@@ -130,13 +130,20 @@ MAPS = ["lvl_tut.tmx", "home.tmx",
 
 # Items
 ITEM_LIST = []
-ITEM_LIST= ['health', "pistol", "shotgun", "sniper", "rifle"]
+ITEM_LIST= ['health',  "pistol", "shotgun", "sniper", "rifle"]
 ITEM_IMAGES = {'health': 'health_pack.png',
-               "door": "door.png",
                "pistol": "pistol.png",
                "shotgun": "shotgun.png",
                "sniper": "sniper.png",
                "rifle": "rifle.png"}
+# Levels
+LVL_LIST = []
+LVL_LIST= ["door_auto", "doorlvl1","doorlvl2"]
+LVL_IMAGES = {'door_auto': 'door_enter.png',
+               "doorlvl1": "doorlvl1.png",
+               "doorlvl2": "doorlvl2.png"}
+
+
 
 HEALTH_PACK_AMOUNT = 20
 ITEM_RESPAWN_TIME = 3*60
@@ -147,9 +154,12 @@ BOB_SPEED = 0.1
 BG_MUSIC = 'calm2.ogg'
 PLAYER_HIT_SOUNDS = ['pain/8.wav', 'pain/9.wav', 'pain/10.wav', 'pain/11.wav']
 PLAYER_STEP_SOUNDS = ['step1.ogg', 'step2.ogg', 'step3.ogg', 'step4.ogg', 'step5.ogg', 'step6.ogg']
+
 ZOMBIE_MOAN_SOUNDS = ['brains2.wav', 'brains3.wav', 'zombie-roar-1.wav', 'zombie-roar-2.wav',
                       'zombie-roar-3.wav', 'zombie-roar-5.wav', 'zombie-roar-6.wav', 'zombie-roar-7.wav']
+
 ZOMBIE_HIT_SOUNDS = ['splat-15.wav']
+
 WEAPON_SOUNDS = {'pistol': ['pistol.wav'],
                  'shotgun': ['shotgun.wav'],
                  'sniper': ['shotgun.wav'],

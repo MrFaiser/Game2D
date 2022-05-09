@@ -15,14 +15,7 @@ from sprites import *
 from savefiles import *
 from tilemap import *
 # HUD functions
-global coins
-global ammo
-try:
-    coins = read_file("save","COINS")
-    ammo = read_file("save", "pistol_ammo")
-except:
-    coins = 0
-    ammo = 0
+
 
 def draw_player_health(surf, x, y, pct):
     if pct < 0:
@@ -97,6 +90,8 @@ class Game:
         self.screen.blit(text_surface, text_rect)
 
     def load_data(self):
+        create_file()
+
         game_folder = path.dirname(__file__)
         img_folder = path.join(game_folder, 'img')
         snd_folder = path.join(game_folder, 'snd')
@@ -117,6 +112,14 @@ class Game:
         self.mob_img["zombie"] = pg.image.load(path.join(img_folder, MOBS["zombie"]["mob_img"])).convert_alpha()
         self.mob_img["zombie_strong"] = pg.image.load(path.join(img_folder, MOBS["zombie_strong"]["mob_img"])).convert_alpha()
 
+        #Player Stats Start
+        self.coins = read_file("save","COINS")
+        self.ammo = read_file("save", "pistol_ammo")
+        self.compas_lvl = read_file("save", "compas_lvl")
+        self.compas_all = read_file("save", "compas_all")
+        #Player Stats End
+
+
         self.splat = pg.image.load(path.join(img_folder, SPLAT)).convert_alpha()
         self.splat = pg.transform.scale(self.splat, (32, 32))
         self.gun_flashes = []
@@ -125,6 +128,9 @@ class Game:
         self.item_images = {}
         for item in ITEM_IMAGES:
             self.item_images[item] = pg.image.load(path.join(img_folder, ITEM_IMAGES[item])).convert_alpha()
+        for item in LVL_IMAGES:
+            self.item_images[item] = pg.image.load(path.join(img_folder, LVL_IMAGES[item])).convert_alpha()
+
         #lighning effect
         self.fog = pg.Surface((WIDTH, HEIGHT))
         self.fog.fill(NIGHT_COLOR)
@@ -171,9 +177,8 @@ class Game:
 #            self.zombie_hit_sounds.append(pg.mixer.Sound(path.join(snd_folder, snd)))
 
 
-    def new(self):
+    def new(self, level):
         # Write Save File
-        create_file()
         # initialize all variables and do all the setup for a new game
         self.all_sprites = pg.sprite.LayeredUpdates()
         self.walls = pg.sprite.Group()
@@ -182,7 +187,8 @@ class Game:
         self.players = pg.sprite.Group()
         self.items = pg.sprite.Group()
         try:
-            self.map = TiledMap(path.join(self.map_folder, MAPS[read_file("save", "CURRENT_LEVEL")]))
+#            self.map = TiledMap(path.join(self.map_folder, MAPS[read_file("save", "CURRENT_LEVEL")]))
+            self.map = TiledMap(path.join(self.map_folder, level))
         except:
             self.map = TiledMap(path.join(self.map_folder, "home.tmx"))
             write_file("save","CURRENT_LEVEL", read_file("save","CURRENT_LEVEL")-1)
@@ -201,7 +207,7 @@ class Game:
                 self.mob = Mob(self, obj_center.x, obj_center.y, "zombie_strong")
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
-            if tile_object.name == 'door':
+            if tile_object.name in LVL_LIST:
                 Item(self, obj_center, tile_object.name)
             if tile_object.name in ITEM_LIST:
                 Item(self, obj_center, tile_object.name)
@@ -212,6 +218,7 @@ class Game:
         self.paused = False
         self.night = False
         self.lvl_fin = False
+        self.compas_is_used = False
         self.effects_sounds['level_start'].play().set_volume(0.2)
         self.info_update()
 
@@ -248,31 +255,11 @@ class Game:
                                          tile_object.y + tile_object.height / 2)
                         if tile_object.name in ITEM_LIST:
                             Item(self, obj_center, tile_object.name)
+                        if tile_object.name in LVL_LIST:
+                            Item(self, obj_center, tile_object.name)
                 #Loop End Item Respawn
-
-            #experiment start
-             # draw_line(self.screen, HEIGHT/2, 10, 100)
-
-            # pg.draw.lines(pg.display.get_surface(), PINK, True,[[self.allmob.pos.x, self.mob.pos.y],
- #                                                               [self.player.pos.x, self.player.pos.y]], 10)
-
             pg.display.flip()
-
-            #w = self.map.tmxdata.width
-            #h = self.map.tmxdata.height
-            #self.height = tm.height * tm.tileheight
-
-            #temp_surface = pg.Surface((w, h))
-
-           # pg.draw.line(temp_surface, CYAN, self.player.pos, [500, 300], 10)
-#            pg.draw.lines(pg.display.get_surface(), PINK, False, [[0, 0], [500, 300]], 10)
-            # draw_line(self.screen, 20, 10, self.player.health / PLAYER_HEALTH)
-
-
-
-            #experiment ende
             self.draw()
-
             if self.lvl_fin:
                 self.lvl_completed()
 
@@ -282,14 +269,12 @@ class Game:
         sys.exit()
 
     def info_update(self):
-        global coins
-        global ammo
-        ammo = read_file("save", self.player.weapon+"_ammo")
-        coins = read_file("save", "COINS")
+        self.ammo = read_file("save", self.player.weapon+"_ammo")
+        self.coins = read_file("save", "COINS")
 
     def get_ammo(self):
         write_file("save", self.player.weapon + "_ammo",
-                   read_file("save", self.player.weapon + "_ammo") + WEAPONS[self.player.weapon]["ammo"])
+        read_file("save", self.player.weapon + "_ammo") + WEAPONS[self.player.weapon]["ammo"])
 
     def update(self):
         # update portion of the game loop
@@ -304,9 +289,17 @@ class Game:
         # player hits items
         hits = pg.sprite.spritecollide(self.player, self.items, False)
         for hit in hits:
-            if hit.type == "door":
+            if hit.type == "door_auto":
                 hit.kill()
                 self.home_completed()
+            elif hit.type == "doorlvl1":
+                hit.kill()
+                self.enter_level_from_home("lvl1.tmx")
+            elif hit.type == "doorlvl2":
+                hit.kill()
+                self.enter_level_from_home("lvl2.tmx")
+
+
             if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
                 hit.kill()
                 self.effects_sounds['health_up'].play()
@@ -377,46 +370,27 @@ class Game:
         # self.screen.fill(BGCOLOR)
         self.screen.blit(self.map_img, self.camera.apply(self.map))
         # self.draw_grid()
-        dist_all = []
         for sprite in self.all_sprites:
             if isinstance(sprite, Mob):
                 sprite.draw_health()
             self.screen.blit(sprite.image, self.camera.apply(sprite))
             if self.draw_debug:
                 pg.draw.rect(self.screen, CYAN, self.camera.apply_rect(sprite.hit_rect), 1)
-###########################
+
+                ###
                 if sprite.type == "zombie" or sprite.type == "zombie_strong":
-                    dist = self.player.pos - sprite.pos
-                    dist_all.append(dist.length())
-                    dist_all.sort()
-                    s = False
-                    if s == True:
-                        pg.draw.line(self.screen, ORANGE, self.camera.apply(self.player).center,
-                             self.camera.apply(sprite).center, 2)
-                        print("##################### TRUE #########")
-        compas_level = 4
-        for sprite in self.all_sprites:
-            if self.draw_debug:
-                #if sprite.type == "zombie" or sprite.type == "zombie_strong":
-                    dist = self.player.pos - sprite.pos
-                    for k in range(compas_level):
-                        try:
-                            if dist.length() == dist_all[k]:
-                                if sprite.type == "zombie":
-                                    pg.draw.line(self.screen, ORANGE, self.camera.apply(self.player).center,
-                                             self.camera.apply(sprite).center, 2)
-                                elif sprite.type == "zombie_strong":
-                                    pg.draw.line(self.screen, RED, self.camera.apply(self.player).center,
-                                             self.camera.apply(sprite).center, 2)
+                    pg.draw.line(self.screen, ORANGE, self.camera.apply(self.player).center,
+                                         self.camera.apply(sprite).center, 2)
+                ###
 
-                        except:
-                            pass
-
-
-###########################
         if self.draw_debug:
             for wall in self.walls:
                 pg.draw.rect(self.screen, CYAN, self.camera.apply_rect(wall.rect), 1)
+        #USE ITEMS
+        if self.compas_is_used:
+            self.use_compas()
+        #USE ITEMS
+
 
         # pg.draw.rect(self.screen, WHITE, self.player.hit_rect, 2)
         #Fog
@@ -426,8 +400,8 @@ class Game:
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
         self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 50, align="w")
-        self.draw_text("Coins: {}".format(coins), self.hud_font, 30, ORANGE, 10, 80, align="w")
-        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(ammo), self.hud_font, 30, DARK_GREY, 10, 110, align="w")
+        self.draw_text("Coins: {}".format(self.coins), self.hud_font, 30, ORANGE, 10, 80, align="w")
+        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(self.ammo), self.hud_font, 30, DARK_GREY, 10, 110, align="w")
      #   self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
 
         self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHT_GREY, WIDTH - 50, 10,align="center")
@@ -437,6 +411,31 @@ class Game:
             self.draw_text("Paused", self.title_font, 105, RED, WIDTH / 2, HEIGHT / 2, align="center")
             self.draw_text("press Esc to play", self.hud_font, 105, GREEN, WIDTH / 2, HEIGHT * 3 / 4, align="center")
         pg.display.flip()
+
+    def use_compas(self):
+        dist_all = []
+        for sprite in self.all_sprites:
+            if sprite.type == "zombie" or sprite.type == "zombie_strong":
+                dist = self.player.pos - sprite.pos
+                dist_all.append(dist.length())
+                dist_all.sort()
+                if self.compas_all:
+                    pg.draw.line(self.screen, ORANGE, self.camera.apply(self.player).center,
+                                     self.camera.apply(sprite).center, 2)
+        for sprite in self.all_sprites:
+            dist = self.player.pos - sprite.pos
+            for k in range(self.compas_lvl):
+                try:
+                    if dist.length() == dist_all[k]:
+                        if sprite.type == "zombie":
+                            pg.draw.line(self.screen, ORANGE, self.camera.apply(self.player).center,
+                                             self.camera.apply(sprite).center, 2)
+                        elif sprite.type == "zombie_strong":
+                                pg.draw.line(self.screen, RED, self.camera.apply(self.player).center,
+                                             self.camera.apply(sprite).center, 2)
+                except:
+                    pass
+
 
     def events(self):
         # catch all events here
@@ -456,7 +455,7 @@ class Game:
                 if event.key == pg.K_0:
                     self.info_update()
                     write_file("save", "COINS", read_file("save","COINS")+2)
-                    coins = read_file("save", "COINS")
+                    self.coins = read_file("save", "COINS")
                     print("+2 Coins")
                     self.get_ammo()
                     self.player.health = 1000
@@ -477,7 +476,7 @@ class Game:
                         self.player.weapon = "rifle"
                     pass
                 if event.key == pg.K_5:
-                    pass
+                   self.compas_is_used = not self.compas_is_used
                 if event.key == pg.K_6:
                     pass
                 if event.key == pg.K_7:
@@ -494,6 +493,8 @@ class Game:
         self.screen.fill(BLACK)
         self.draw_text("START GAME", self.title_font, 100, YELLOW, WIDTH / 2, HEIGHT / 2, align="center")
         self.draw_text("Press ENTER to start", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
+
+
 
         pg.display.flip()
         self.wait_for_key()
@@ -518,18 +519,35 @@ class Game:
         current_level = current_level + 1
         write_file("save", "CURRENT_LEVEL", current_level)
 
-        self.new()
+        self.new("home.tmx")
 
     def home_completed(self):
         self.screen.fill(BLACK)
         self.draw_text("Let's Go!", self.title_font, 100, BROWN, WIDTH / 2, HEIGHT / 2, align="center")
         self.draw_text("Press ENTER to Fight!", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
+        self.compas_lvl = read_file("save", "compas_lvl")
+        self.compas_all = read_file("save", "compas_all")
+
         pg.display.flip()
         self.wait_for_key()
         current_level = read_file("save", "CURRENT_LEVEL")
         current_level = current_level + 1
         write_file("save", "CURRENT_LEVEL", current_level)
-        self.new()
+        self.new(MAPS[read_file("save", "CURRENT_LEVEL")])
+
+    def enter_level_from_home(self, level):
+        self.screen.fill(DARK_GREY)
+        self.draw_text("Let's Go!" + str(level), self.title_font, 100, BROWN, WIDTH / 2, HEIGHT / 2, align="center")
+        self.draw_text("Press ENTER to Fight!", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4, align="center")
+        self.compas_lvl = read_file("save", "compas_lvl")
+        self.compas_all = read_file("save", "compas_all")
+
+        pg.display.flip()
+        self.wait_for_key()
+        self.map = TiledMap(path.join(self.map_folder, level))
+        self.new(level)
+
+
 
     def wait_for_key(self):
         pg.event.wait()
@@ -549,6 +567,6 @@ class Game:
 g = Game()
 g.show_start_screen()
 while True:
-    g.new()
+    g.new("home.tmx")
     g.run()
     g.show_go_screen()

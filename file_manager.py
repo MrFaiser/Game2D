@@ -6,13 +6,14 @@ data = {
     'save': [
         {
             'NAME': "user",
-            'CURRENT_LEVEL': 0,
+            'CURRENT_LEVEL': -1,
             'COINS': 0,
             "pistol_ammo": 25,
             "shotgun_ammo": -1,
             "sniper_ammo": -1,
             "rifle_ammo": -1,
-            "compas": True
+            "compas_lvl": 0,
+            "compas_all": False
 
         }
     ]
@@ -26,7 +27,7 @@ def create_file():
             print(data)
             print("Create File!")
     else:
-        print("File not empty!")
+        print("File already exists!")
 
 
 def read_file(region, key):
@@ -45,4 +46,3 @@ def write_file(region, key, wert):
 
     with open("savefiles/data.json", "w") as File:
         File.write(json.dumps(data, indent=4))
-
