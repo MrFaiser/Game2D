@@ -211,7 +211,13 @@ class Game:
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
             if tile_object.name in LVL_LIST:
-                Item(self, obj_center, tile_object.name)
+                t = tile_object.name
+                tt = t.replace("doorlvl", "")
+                if tt == "door_auto":
+                    Item(self, obj_center, tile_object.name)
+                if str(tt) <= str(self.current_level):
+                    Item(self, obj_center, tile_object.name)
+
             if tile_object.name in ITEM_LIST:
                 Item(self, obj_center, tile_object.name)
 
@@ -253,7 +259,12 @@ class Game:
                         if tile_object.name in ITEM_LIST:
                             Item(self, obj_center, tile_object.name)
                         if tile_object.name in LVL_LIST:
-                            Item(self, obj_center, tile_object.name)
+                            t = tile_object.name
+                            tt = t.replace("doorlvl", "")
+                            if tt == "door_auto":
+                                Item(self, obj_center, tile_object.name)
+                            if str(tt) <= str(self.current_level):
+                                Item(self, obj_center, tile_object.name)
                 #Loop End Item Respawn
             pg.display.flip()
             self.draw()
@@ -482,6 +493,7 @@ class Game:
                 if event.key == pg.K_7:
                     pass
                 if event.key == pg.K_8:
+                    print(8)
                     pass
                 if event.key == pg.K_9:
                     pass
