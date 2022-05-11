@@ -2,13 +2,13 @@
     "save": [
         {
             "NAME": "user",
-            "CURRENT_LEVEL": 1,
-            "COINS": 108,
-            "pistol_ammo": 23329,
-            "shotgun_ammo": 44601,
-            "sniper_ammo": 434323,
-            "rifle_ammo": 2342318,
-            "laser_ammo": 8225,
+            "CURRENT_LEVEL": 0,
+            "COINS": 10,
+            "pistol_ammo": 444499,
+            "shotgun_ammo": 324485,
+            "sniper_ammo": 2323232323,
+            "rifle_ammo": 2222210,
+            "laser_ammo": 234234234196,
             "compas_lvl": 0,
             "compas_all": false
         }

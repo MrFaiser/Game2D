@@ -99,6 +99,7 @@ class Player(pg.sprite.Sprite):
                     snd.play()
                 MuzzleFlash(self.game, pos)
 
+
     def hit(self):
         self.damaged = True
         self.damage_alpha = chain(DAMAGE_ALPHA * 2)

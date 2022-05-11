@@ -8,6 +8,8 @@ data = {
             'NAME': "user",
             'CURRENT_LEVEL': -1,
             'COINS': 0,
+            "max_hp" : 0,
+            "auto_reg": 1,
             "pistol_ammo": 25,
             "shotgun_ammo": -1,
             "sniper_ammo": -1,

@@ -28,7 +28,7 @@ GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
 # Player settings
-PLAYER_HEALTH = 100
+PLAYER_HEALTH = 20
 PLAYER_SPEED =280
 PLAYER_ROT_SPEED = 200
 PLAYER_IMG = 'manBlue_gun.png'
@@ -95,7 +95,6 @@ MOBS["zombie"] = {"mob_img": "zombie1_hold.png",
                   "avoid_radius":20,
                   "detect_radius":400,
                   "coin_reward":1}
-
 MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "mob_speed": [200, 10],
                   "mob_hit_rect": pg.Rect(0, 0, 30, 30),
@@ -105,7 +104,6 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "avoid_radius":20,
                   "detect_radius":200,
                   "coin_reward": 2}
-
 
 
 # Effects
@@ -128,15 +126,6 @@ MOB_LAYER = 2
 EFFECTS_LAYER = 4
 ITEMS_LAYER = 1
 
-# Maps
-#CURRENT_LEVEL = 0
-MAPS = []
-MAPS = ["lvl_tut.tmx",
-        "lvl1.tmx",
-        "lvl2.tmx",
-        "lvl3.tmx",
-        "lvl4.tmx",
-        ]
 
 # Items
 ITEM_LIST = []
@@ -147,17 +136,56 @@ ITEM_IMAGES = {'health': 'health_pack.png',
                "sniper": "sniper.png",
                "rifle": "rifle.png",
                "laser": "laser.png"}
+
+# Maps
+#CURRENT_LEVEL = 0
+MAPS = []
+MAPS = ["lvl_tut.tmx",
+        "lvl1.tmx",
+        "lvl2.tmx",
+        "lvl3.tmx",
+        "lvl4.tmx",
+        "lvl5.tmx",
+        "lvl6.tmx",
+        "lvl7.tmx",
+        "lvl8.tmx",
+        "lvl9.tmx",
+        "lvl10.tmx",
+        "lvl11.tmx",
+        ]
+
 # Levels
 LVL_LIST = []
-LVL_LIST= ["door_auto", "doorlvl1","doorlvl2"]
+LVL_LIST= ["door_auto",
+           "doorlvl1",
+           "doorlvl2",
+           "doorlvl3",
+           "doorlvl4",
+           "doorlvl5",
+           "doorlvl6",
+           "doorlvl7",
+           "doorlvl8",
+           "doorlvl9",
+           "doorlvl10",
+           "doorlvl11"]
+
 LVL_IMAGES = {'door_auto': 'door_enter.png',
                "doorlvl1": "doorlvl1.png",
-               "doorlvl2": "doorlvl2.png"}
+               "doorlvl2": "doorlvl2.png",
+               "doorlvl3": "doorlvl3.png",
+               "doorlvl4": "doorlvl4.png",
+               "doorlvl5": "doorlvl5.png",
+               "doorlvl6": "doorlvl6.png",
+               "doorlvl7": "doorlvl7.png",
+               "doorlvl8": "doorlvl8.png",
+               "doorlvl9": "doorlvl9.png",
+               "doorlvl10": "doorlvl10.png",
+               "doorlvl11": "doorlvl10.png"}
 
 
 
 HEALTH_PACK_AMOUNT = 20
-ITEM_RESPAWN_TIME = 5# 3*60
+ITEM_RESPAWN_TIME = 10# 3*60
 BOB_RANGE = 15
 BOB_SPEED = 0.1
 

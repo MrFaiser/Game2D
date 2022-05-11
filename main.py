@@ -20,8 +20,11 @@ from tilemap import *
 def draw_player_health(surf, x, y, pct):
     if pct < 0:
         pct = 0
-    BAR_LENGTH = 150
-    BAR_HEIGHT = 20
+    if PLAYER_HEALTH <= 150:
+        BAR_LENGTH = 120
+    else:
+        BAR_LENGTH = PLAYER_HEALTH * 0.8
+    BAR_HEIGHT = 30
     fill = pct * BAR_LENGTH
     outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
@@ -215,9 +218,8 @@ class Game:
                 tt = t.replace("doorlvl", "")
                 if tt == "door_auto":
                     Item(self, obj_center, tile_object.name)
-                if str(tt) <= str(self.current_level):
+                elif int(tt) <= self.current_level:
                     Item(self, obj_center, tile_object.name)
-
             if tile_object.name in ITEM_LIST:
                 Item(self, obj_center, tile_object.name)
 
@@ -263,9 +265,13 @@ class Game:
                             tt = t.replace("doorlvl", "")
                             if tt == "door_auto":
                                 Item(self, obj_center, tile_object.name)
-                            if str(tt) <= str(self.current_level):
+                            elif int(tt) <= self.current_level:
                                 Item(self, obj_center, tile_object.name)
-                #Loop End Item Respawn
+                    #Loop End Item Respawn
+                # loop reg start
+                if (time_now - time_start) >= ITEM_RESPAWN_TIME:
+                    pass
+                #loop reg end
             pg.display.flip()
             self.draw()
             if self.lvl_fin:
@@ -279,6 +285,7 @@ class Game:
     def info_update(self):
         self.ammo = read_file("save", self.player.weapon+"_ammo")
         self.coins = read_file("save", "COINS")
+        print(time.time())
 
     def get_ammo(self):
         write_file("save", self.player.weapon + "_ammo",
@@ -409,9 +416,10 @@ class Game:
 
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
-        self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 50, align="w")
-        self.draw_text("Coins: {}".format(self.coins), self.hud_font, 30, ORANGE, 10, 80, align="w")
-        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(self.ammo), self.hud_font, 30, DARK_GREY, 10, 110, align="w")
+        self.draw_text("HP: {}".format(self.player.health) + " / {}".format(PLAYER_HEALTH), self.hud_font, 15, DARK_GREY, 15, 25, align="w")
+        self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 55, align="w")
+        self.draw_text("Coins: {}".format(self.coins), self.hud_font, 30, ORANGE, 10, 85, align="w")
+        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(self.ammo), self.hud_font, 30, DARK_GREY, 10, 115, align="w")
      #   self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
 
         self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHT_GREY, WIDTH - 50, 10,align="center")
@@ -497,7 +505,6 @@ class Game:
                     pass
                 if event.key == pg.K_9:
                     pass
-                self.info_update()
 
 
 
