@@ -2,14 +2,23 @@
     "save": [
         {
             "NAME": "user",
-            "CURRENT_LEVEL": 0,
-            "COINS": 10,
-            "pistol_ammo": 444499,
-            "shotgun_ammo": 324485,
-            "sniper_ammo": 2323232323,
-            "rifle_ammo": 2222210,
-            "laser_ammo": 234234234196,
-            "compas_lvl": 0,
+            "CURRENT_LEVEL": -1,
+            "COINS": 36,
+            "sprint_speed": 4,
+            "hp": 20,
+            "max_hp": 20,
+            "auto_reg_lvl": 0,
+            "auto_reg_amount": 1,
+            "stamina": 30,
+            "max_stamina": 30,
+            "stamina_reg": 10.1,
+            "stamina_cost": 1,
+            "pistol_ammo": 425,
+            "shotgun_ammo": 9,
+            "sniper_ammo": -1,
+            "rifle_ammo": -1,
+            "laser_ammo": 1234567890,
+            "compas_lvl": 1,
             "compas_all": false
         }
     ]

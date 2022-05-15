@@ -15,17 +15,27 @@ from sprites import *
 from savefiles import *
 from tilemap import *
 # HUD functions
+try:
+    hp = read_file("save", "hp")
+    st = read_file("save", "stamina")
+except:
+    hp = 20
+    st = 20
 
 
 def draw_player_health(surf, x, y, pct):
     if pct < 0:
         pct = 0
-    if PLAYER_HEALTH <= 150:
+    if hp <= 150:
         BAR_LENGTH = 120
+    elif hp <= 500:
+        BAR_LENGTH = 400
     else:
-        BAR_LENGTH = PLAYER_HEALTH * 0.8
+        BAR_LENGTH = hp * 0.8
+
     BAR_HEIGHT = 30
     fill = pct * BAR_LENGTH
+    back_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
     if pct >= 0.8:
@@ -36,6 +46,34 @@ def draw_player_health(surf, x, y, pct):
         col = ORANGE
     else:
         col = RED
+    pg.draw.rect(surf, LIGHT_GREY, back_rect)
+    pg.draw.rect(surf, col, fill_rect)
+    pg.draw.rect(surf, WHITE, outline_rect, 2)
+
+def draw_player_stamina(surf, x, y, pct, down):
+    if pct < 0:
+        pct = 0
+    if st <= 150:
+        BAR_LENGTH = 120
+    elif st <= 500:
+        BAR_LENGTH = 400
+    else:
+        BAR_LENGTH = st * 0.8
+
+    BAR_HEIGHT = 22.5
+    fill = pct * BAR_LENGTH
+    back_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    outline_rect = pg.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pg.Rect(x, y, fill, BAR_HEIGHT)
+    if pct >= 1:
+        col = BLUE
+    elif pct < 0.2 :
+        col = RED
+    else:
+        col = LiGHT_BLUE
+    if down:
+        col = GREY
+    pg.draw.rect(surf, LIGHT_GREY, back_rect)
     pg.draw.rect(surf, col, fill_rect)
     pg.draw.rect(surf, WHITE, outline_rect, 2)
 
@@ -227,56 +265,68 @@ class Game:
         self.camera = Camera(self.map.width, self.map.height)
         self.draw_debug = False
         self.paused = False
+        self.shop = False
         self.night = False
         self.lvl_fin = False
         self.compas_is_used = False
         self.level_selectet = False
+        self.buy_cooldown = False
         self.effects_sounds['level_start'].play().set_volume(0.2)
         self.info_update()
-
 
     def run(self):
         # game loop - set self.playing = False to end the game
         self.playing = True
         pg.mixer.music.play(loops=-1)
-        time_start = time.time()
+        time_start_item_respawn = time.time()
+        time_start_auto_reg = time.time()
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000.0  # fix for Python 2.x
             self.events()
             if not self.paused:
-                self.update()
-                #Start loop Item Respawn
-                time_now = time.time()
-                if (time_now - time_start) >= ITEM_RESPAWN_TIME:
-                    time_start = time.time()
-                    hits = self.items
+                if not self.shop:
+                    self.update()
 
-                    for hit in hits:
-                        for item in ITEM_LIST:
-                            hit.kill()
+                    #Start loop Item Respawn
+                    time_now = time.time()
+                    if (time_now - time_start_item_respawn) >= ITEM_RESPAWN_TIME:
+                        time_start_item_respawn = time.time()
+                        hits = self.items
 
-                    for tile_object in self.map.tmxdata.objects:
-                        obj_center = vec(tile_object.x + tile_object.width / 2,
-                                         tile_object.y + tile_object.height / 2)
-                        if tile_object.name in ITEM_LIST:
-                            Item(self, obj_center, tile_object.name)
-                        if tile_object.name in LVL_LIST:
-                            t = tile_object.name
-                            tt = t.replace("doorlvl", "")
-                            if tt == "door_auto":
+                        for hit in hits:
+                            for item in ITEM_LIST:
+                                hit.kill()
+
+                        for tile_object in self.map.tmxdata.objects:
+                            obj_center = vec(tile_object.x + tile_object.width / 2,
+                                             tile_object.y + tile_object.height / 2)
+                            if tile_object.name in ITEM_LIST:
                                 Item(self, obj_center, tile_object.name)
-                            elif int(tt) <= self.current_level:
-                                Item(self, obj_center, tile_object.name)
-                    #Loop End Item Respawn
-                # loop reg start
-                if (time_now - time_start) >= ITEM_RESPAWN_TIME:
-                    pass
-                #loop reg end
+                            if tile_object.name in LVL_LIST:
+                                t = tile_object.name
+                                tt = t.replace("doorlvl", "")
+                                if tt == "door_auto":
+                                    Item(self, obj_center, tile_object.name)
+                                elif int(tt) <= self.current_level:
+                                    Item(self, obj_center, tile_object.name)
+                        #Loop End Item Respawn
+                    # loop reg start
+                    if self.player.auto_reg_lvl >= 1:
+                        if (time_now - time_start_auto_reg) >= (6.5-(self.player.auto_reg_lvl/17)*(self.player.auto_reg_lvl/100)):
+                            time_start_auto_reg = time.time()
+                            self.player.add_health(1.5 + (self.player.auto_reg_amount/1.8)*(self.player.auto_reg_amount/45))
+                    #loop reg end
+                    # Buy cooldown start
+                    if self.buy_cooldown == True:
+                        if(time_now - self.time_start_buy_cooldown >= 5):
+                            self.time_start_buy_cooldown = time.time()
+                            self.buy_cooldown = False
+                    # Buy cooldown end
+
             pg.display.flip()
             self.draw()
             if self.lvl_fin:
                 self.lvl_completed()
-
 
     def quit(self):
         pg.quit()
@@ -285,7 +335,7 @@ class Game:
     def info_update(self):
         self.ammo = read_file("save", self.player.weapon+"_ammo")
         self.coins = read_file("save", "COINS")
-        print(time.time())
+        print("info update", time.time())
 
     def get_ammo(self):
         write_file("save", self.player.weapon + "_ammo",
@@ -315,34 +365,71 @@ class Game:
                 if read_file("save", "CURRENT_LEVEL") >= 2:
                     hit.kill()
                     self.enter_level_from_home("lvl2.tmx")
+            elif hit.type == "doorlvl3":
+                if read_file("save", "CURRENT_LEVEL") >= 3:
+                    hit.kill()
+                    self.enter_level_from_home("lvl3.tmx")
+            elif hit.type == "doorlvl4":
+                if read_file("save", "CURRENT_LEVEL") >= 4:
+                    hit.kill()
+                    self.enter_level_from_home("lvl4.tmx")
+            elif hit.type == "doorlvl5":
+                if read_file("save", "CURRENT_LEVEL") >= 5:
+                    hit.kill()
+                    self.enter_level_from_home("lvl5.tmx")
+            elif hit.type == "doorlvl6":
+                if read_file("save", "CURRENT_LEVEL") >= 6:
+                    hit.kill()
+                    self.enter_level_from_home("lvl6.tmx")
+            elif hit.type == "doorlvl7":
+                if read_file("save", "CURRENT_LEVEL") >= 7:
+                    hit.kill()
+                    self.enter_level_from_home("lvl7.tmx")
+            elif hit.type == "doorlvl8":
+                if read_file("save", "CURRENT_LEVEL") >= 8:
+                    hit.kill()
+                    self.enter_level_from_home("lvl8.tmx")
+            elif hit.type == "doorlvl9":
+                if read_file("save", "CURRENT_LEVEL") >= 9:
+                    hit.kill()
+                    self.enter_level_from_home("lvl9.tmx")
+            elif hit.type == "doorlvl10":
+                if read_file("save", "CURRENT_LEVEL") >= 10:
+                    hit.kill()
+                    self.enter_level_from_home("lvl10.tmx")
 
 
-            if hit.type == 'health' and self.player.health < PLAYER_HEALTH:
+            if hit.type == 'health' and self.player.health < self.player.max_health:
                 hit.kill()
                 self.effects_sounds['health_up'].play()
                 self.player.add_health(HEALTH_PACK_AMOUNT)
+                self.info_update()
             if hit.type == "pistol":
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "pistol"
                 self.get_ammo()
+                self.info_update()
             if hit.type == "shotgun":
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "shotgun"
                 self.get_ammo()
+                self.info_update()
             if hit.type == "sniper":
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "sniper"
                 self.get_ammo()
+                self.info_update()
             if hit.type == "rifle":
                 hit.kill()
                 self.effects_sounds["gun_pickup"].play()
                 self.player.weapon = "rifle"
                 self.get_ammo()
+                self.info_update()
 
-            self.info_update()
+            self.buy_upgrade(hit)
 
         # mobs hit player
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
@@ -360,7 +447,7 @@ class Game:
                 self.playing = False
         if hits:
             self.player.hit()
-            self.player.pos += vec(MOBS[zombie_type]["mob_knockback"],0).rotate(-self.player.rot+180)
+            self.player.pos += vec(MOBS[zombie_type]["mob_knockback"], 0).rotate(-self.player.rot+180)
 #
         # bullets hit mobs
         hits = pg.sprite.groupcollide(self.mobs, self.bullets, False, True)
@@ -368,6 +455,76 @@ class Game:
             for bullet in hits[mob]:
                 mob.health -= bullet.damage
             mob.vel = vec(0, 0)
+
+    def create_shop_frame(self, item):
+        sizeX = 160
+        sizeY = 50
+
+        acceptX = 100
+        acceptY = 500
+
+        deniedX = WIDTH - 200 - sizeX
+        deniedY = 500
+
+
+        self.screen.blit(self.dim_screen, (0, 0))
+
+        while self.shop:
+            for ev in pygame.event.get():
+                if ev.type == pg.QUIT:
+                    self.quit()
+
+                #erstelle butten funktion position
+                if ev.type == pygame.MOUSEBUTTONDOWN:
+                    #accept
+                    if acceptX <= mouse[0] <= acceptX + sizeX and acceptY <= mouse[1] <= acceptY + sizeY:
+                        print("yess", item.type)
+                        self.shop = False
+                    #denied
+                    if deniedX <= mouse[0] <= deniedX + sizeX and deniedY <= mouse[1] <= deniedY + sizeY:
+                        print("nein", item.type)
+                        self.shop = False
+
+
+            mouse = pygame.mouse.get_pos()
+
+
+            #create button sichtbar position
+            #accept
+            if acceptX <= mouse[0] <= acceptX + sizeX and acceptY <= mouse[1] <= acceptY + sizeY:
+                pygame.draw.rect(self.screen, LIGHT_GREY, [acceptX, acceptY, sizeX, sizeY])
+            else:
+                pygame.draw.rect(self.screen, BLACK, [acceptX, acceptY, sizeX, sizeY])
+
+
+            #denied
+            if deniedX <= mouse[0] <= deniedX + sizeX and deniedY <= mouse[1] <= deniedY + sizeY:
+                pygame.draw.rect(self.screen, LIGHT_GREY, [deniedX, deniedY, sizeX, sizeY])
+            else:
+                pygame.draw.rect(self.screen, BLACK, [deniedX, deniedY, sizeX, sizeY])
+
+
+
+            self.draw_text("SHOP", self.title_font, 105, ORANGE, WIDTH / 2, 50, align="center")
+            self.draw_text(item.type, self.hud_font, 70, RED, WIDTH/2, 200, align="center")
+            self.draw_text("accept", self.hud_font, 40, GREEN, acceptX+5, acceptY, align="nw")
+            self.draw_text("denied", self.hud_font, 40, RED, deniedX+5, deniedY, align="nw")
+            pg.display.update()
+
+
+    def buy_upgrade(self, item):
+        if self.buy_cooldown == False:
+            if item.type == "max_health_up":
+                self.buy_cooldown = True
+                self.time_start_buy_cooldown = time.time()
+                print("-----")
+                print("kauf menü")
+                print("-----")
+
+                self.shop = True
+                self.create_shop_frame(item)
+
+
 
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
@@ -380,7 +537,6 @@ class Game:
         self.light_rect.center = self.camera.apply(self.player).center
         self.fog.blit(self.light_mask, self.light_rect)
         self.screen.blit(self.fog, (0, 0), special_flags=pg.BLEND_MULT)
-
 
     def draw(self):
         pg.display.set_caption("{:.2f}".format(self.clock.get_fps()))
@@ -415,10 +571,14 @@ class Game:
             self.render_fog()
 
         # HUD functions
-        draw_player_health(self.screen, 10, 10, self.player.health / PLAYER_HEALTH)
-        self.draw_text("HP: {}".format(self.player.health) + " / {}".format(PLAYER_HEALTH), self.hud_font, 15, DARK_GREY, 15, 25, align="w")
-        self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 55, align="w")
-        self.draw_text("Coins: {}".format(self.coins), self.hud_font, 30, ORANGE, 10, 85, align="w")
+        draw_player_health(self.screen, 10, 10, self.player.health / self.player.max_health)
+        self.draw_text("HP: {}".format(round(self.player.health,2)) + " / {}".format(self.player.max_health), self.hud_font, 15, DARK_GREY, 15, 25, align="w")
+        draw_player_stamina(self.screen, 10, 45, self.player.stamina / self.player.max_stamina, self.player.out_of_stamina)
+        self.draw_text("ST: {}".format(round(self.player.stamina,2)) + " / {}".format(self.player.max_stamina), self.hud_font, 15, DARK_GREY, 15, 55, align="w")
+
+
+        self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 155, align="w")
+        self.draw_text("Coins: {}".format(self.coins), self.hud_font, 30, ORANGE, 10, 185, align="w")
         self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(self.ammo), self.hud_font, 30, DARK_GREY, 10, 115, align="w")
      #   self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
 
@@ -428,6 +588,7 @@ class Game:
             self.screen.blit(self.dim_screen, (0, 0))
             self.draw_text("Paused", self.title_font, 105, RED, WIDTH / 2, HEIGHT / 2, align="center")
             self.draw_text("press Esc to play", self.hud_font, 105, GREEN, WIDTH / 2, HEIGHT * 3 / 4, align="center")
+
         pg.display.flip()
 
     def use_compas(self):
@@ -454,7 +615,6 @@ class Game:
                 except:
                     pass
 
-
     def events(self):
         # catch all events here
         for event in pg.event.get():
@@ -475,7 +635,10 @@ class Game:
                     self.coins = read_file("save", "COINS")
                     print("+2 Coins")
                     self.get_ammo()
+                    self.player.max_health = 1000
                     self.player.health = 1000
+                    self.player.max_stamina = 1000
+                    self.player.stamina = 1000
                 if event.key == pg.K_1:
                     if read_file("save", "pistol_ammo") >= 0:
                         self.player.weapon = "pistol"
@@ -505,8 +668,6 @@ class Game:
                     pass
                 if event.key == pg.K_9:
                     pass
-
-
 
     def show_start_screen(self):
         self.screen.fill(BLACK)

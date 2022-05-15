@@ -49,11 +49,23 @@ class Player(pg.sprite.Sprite):
         self.pos = vec(x, y)
         self.rot = 0
         self.last_shot = 0
-        self.health = PLAYER_HEALTH
+        self.sprint_speed = read_file("save","sprint_speed")
+        self.stamina = read_file("save","stamina")
+        self.max_stamina = read_file("save","max_stamina")
+        self.stamina_reg = read_file("save","stamina_reg")
+        self.stamina_cost = read_file("save","stamina_cost")
+        self.health = read_file("save","hp")
+        self.auto_reg_lvl = read_file("save","auto_reg_lvl")
+        self.auto_reg_amount = read_file("save","auto_reg_amount")
+        self.max_health = read_file("save","max_hp")
         self.weapon = 'pistol'
         self.damaged = False
+        self.out_of_stamina = False
+        self.sprinting = False
 
     def get_keys(self):
+        global test
+        global down
         self.rot_speed = 0
         self.vel = vec(0, 0)
         keys = pg.key.get_pressed()
@@ -77,6 +89,30 @@ class Player(pg.sprite.Sprite):
         if keys[pg.K_SPACE]:
             self.shoot()
 
+        #Rennen & Audauer
+        if keys[pg.K_LSHIFT] or keys[pg.K_RSHIFT]:
+            if self.stamina > 0:
+                if self.out_of_stamina == False:
+                    self.vel = vec(PLAYER_SPEED * self.sprint_speed, 0).rotate(-self.rot)
+                    self.stamina = self.stamina - self.stamina_cost
+                    self.sprinting =True
+                    if self.stamina <= 0:
+                        self.out_of_stamina = True
+                        self.sprinting = False
+        else:
+            self.sprinting = False
+        if self.stamina < self.max_stamina:
+            if self.sprinting == False:
+                self.stamina = self.stamina + self.stamina_reg
+                if self.out_of_stamina == True:
+                    if self.stamina >= self.max_stamina:
+                        self.sprinting = False
+                        self.out_of_stamina = False
+                        self.stamina = self.max_stamina
+        else:
+            self.stamina = self.max_stamina
+            self.out_of_stamina = False
+        #Sound stop
         if snd.get_num_channels() > 1:
             snd.stop()
 
@@ -125,8 +161,8 @@ class Player(pg.sprite.Sprite):
 
     def add_health(self, amount):
         self.health += amount
-        if self.health > PLAYER_HEALTH:
-            self.health = PLAYER_HEALTH
+        if self.health > self.max_health:
+            self.health = self.max_health
 
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y, type):
@@ -191,7 +227,7 @@ class Mob(pg.sprite.Sprite):
             choice(self.game.zombie_hit_sounds).play()
             self.kill()
             self.game.map_img.blit(self.game.splat, self.pos - vec(32, 32))
-            write_file("save", "COINS", read_file("save", "COINS") + MOBS[self.type]["coin_reward"])
+            write_file("save", "coins", read_file("save", "coins") + MOBS[self.type]["coin_reward"])
             self.game.info_update()
 
     def draw_health(self):

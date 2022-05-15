@@ -5,12 +5,14 @@ vec = pg.math.Vector2
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 DARK_GREY = (40, 40, 40)
-LIGHT_GREY = (100, 100, 100)
+GREY = (100, 100, 100)
+LIGHT_GREY = (180, 180, 180)
 GREEN = (0, 255, 0)
 DARK_GREEN = (0, 100, 0)
 RED = (255, 0, 0)
 YELLOW = (255, 255, 0)
 BLUE = (0, 0, 255)
+LiGHT_BLUE = (80, 80, 255)
 BROWN = (106, 55, 5)
 ORANGE = (255, 136, 0)
 CYAN = (0, 255, 255)
@@ -20,7 +22,7 @@ PINK = (255,105,180)
 WIDTH = 1000   # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
 FPS = 60
-TITLE = "Tilemap Demo"
+TITLE = "Titelfenster lol"
 BGCOLOR = BROWN
 
 TILESIZE = 62
@@ -28,7 +30,7 @@ GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
 # Player settings
-PLAYER_HEALTH = 20
+#PLAYER_HEALTH = 20
 PLAYER_SPEED =280
 PLAYER_ROT_SPEED = 200
 PLAYER_IMG = 'manBlue_gun.png'
@@ -129,8 +131,17 @@ ITEMS_LAYER = 1
 
 # Items
 ITEM_LIST = []
-ITEM_LIST= ['health',  "pistol", "shotgun", "sniper", "rifle"]
+ITEM_LIST= ['health',
+            "max_health_up", "health_pack_up", "auto_reg_up", "auto_reg_amount", "show_player_hp"
+            "pistol", "shotgun", "sniper", "rifle"]
 ITEM_IMAGES = {'health': 'health_pack.png',
+
+               "max_health_up": "max_health_up.png",
+               "health_pack_up": "health_pack_up.png",
+               "auto_reg_up": "auto_reg_up.png",
+               "auto_reg_amount": "auto_reg_amount.png",
+               #"show_player_hp": "show_player_hp.png",
+
                "pistol": "pistol.png",
                "shotgun": "shotgun.png",
                "sniper": "sniper.png",
@@ -168,7 +179,6 @@ LVL_LIST= ["door_auto",
            "doorlvl9",
            "doorlvl10",
            "doorlvl11"]
-
 LVL_IMAGES = {'door_auto': 'door_enter.png',
                "doorlvl1": "doorlvl1.png",
                "doorlvl2": "doorlvl2.png",
