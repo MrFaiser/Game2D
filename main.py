@@ -517,10 +517,26 @@ class Game:
             if item.type == "max_health_up":
                 self.buy_cooldown = True
                 self.time_start_buy_cooldown = time.time()
-                print("-----")
-                print("kauf menü")
-                print("-----")
-
+                self.shop = True
+                self.create_shop_frame(item)
+            if item.type == "health_pack_up":
+                self.buy_cooldown = True
+                self.time_start_buy_cooldown = time.time()
+                self.shop = True
+                self.create_shop_frame(item)
+            if item.type == "auto_reg_up":
+                self.buy_cooldown = True
+                self.time_start_buy_cooldown = time.time()
+                self.shop = True
+                self.create_shop_frame(item)
+            if item.type == "auto_reg_amount":
+                self.buy_cooldown = True
+                self.time_start_buy_cooldown = time.time()
+                self.shop = True
+                self.create_shop_frame(item)
+            if item.type == "show_player_hp":
+                self.buy_cooldown = True
+                self.time_start_buy_cooldown = time.time()
                 self.shop = True
                 self.create_shop_frame(item)
 
