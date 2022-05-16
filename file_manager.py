@@ -13,6 +13,8 @@ data = {
             "sprint_speed": 1.5,
             "hp": 20,
             "max_hp": 20,
+            "auto_reg_time": 6.5,
+            "auto_reg_amount": 0,
             "health_pack": 20,
             "stamina": 30,
             "max_stamina": 30,
@@ -22,7 +24,7 @@ data = {
             #upgrade lvl
             "UPGRADE_LEVEL_max_health_up": 0,
             "UPGRADE_LEVEL_health_pack_up": 0,
-            "UPGRADE_LEVEL_auto_reg_up": 0,
+            "UPGRADE_LEVEL_auto_reg_up_time": 0,
             "UPGRADE_LEVEL_auto_reg_amount": 0,
             "UPGRADE_LEVEL_show_player_hp": 0,
 

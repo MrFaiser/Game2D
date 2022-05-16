@@ -28,7 +28,7 @@ def draw_player_health(surf, x, y, pct):
     if pct < 0:
         pct = 0
     if hp <= 150:
-        BAR_LENGTH = 120
+        BAR_LENGTH = 140
     elif hp <= 500:
         BAR_LENGTH = 400
     else:
@@ -55,7 +55,7 @@ def draw_player_stamina(surf, x, y, pct, down):
     if pct < 0:
         pct = 0
     if st <= 150:
-        BAR_LENGTH = 120
+        BAR_LENGTH = 140
     elif st <= 500:
         BAR_LENGTH = 400
     else:
@@ -313,11 +313,13 @@ class Game:
                         #Loop End Item Respawn
                     # loop reg start
                     if self.player.auto_reg_up >= 1:
-                        if (time_now - time_start_auto_reg) >= (6.5-(self.player.auto_reg_up/17)*(self.player.auto_reg_up/100)):
-                            time_start_auto_reg = time.time()
-                            self.player.add_health(1.5 + (self.player.auto_reg_amount/1.8)*(self.player.auto_reg_amount/45))
-                            write_file("save", "hp", self.player.health)
-                            print("reg", self.player.auto_reg_amount)
+                        if (time_now - time_start_auto_reg) >= self.player.auto_reg_up:
+                            if self.player.health < self.player.max_health:
+                                time_start_auto_reg = time.time()
+
+                                self.player.add_health(1.5 + (self.player.auto_reg_amount/1.8)*(self.player.auto_reg_amount/45))
+                                write_file("save", "hp", self.player.health)
+                                print("reg", self.player.auto_reg_amount)
                     #loop reg end
                     # Buy cooldown start
                     if self.buy_cooldown == True:
@@ -341,6 +343,9 @@ class Game:
         self.xp_lvl = read_file("save", "xp")
         self.player.health = read_file("save", "hp")
         self.player.max_health = read_file("save", "max_hp")
+        self.player.auto_reg_up = read_file("save", "auto_reg_time")
+        self.player.auto_reg_amount = read_file("save", "auto_reg_amount")
+
         print("info update", time.time())
 
     def get_ammo(self):
@@ -462,7 +467,10 @@ class Game:
                 mob.health -= bullet.damage
             mob.vel = vec(0, 0)
 
-    def create_shop_frame(self, item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl, cur_lvl_path, cur_value_path):
+    def create_shop_frame(self, item, text1,text2, text3,
+                          cur_lvl, cur_value, cost_to_nxt_lvl, currency,
+                          value_by_next_lvl, complete_value_by_next_lvl,
+                          cur_lvl_path, cur_value_path,level_after_buy):
         sizeX = 200
         sizeY = 50
 
@@ -498,7 +506,7 @@ class Game:
                             #currency abziehen
                             write_file("save", currency.lower(), konto-cost_to_nxt_lvl)
                             #lvl aufsteigen
-                            write_file("save", cur_lvl_path, cur_lvl+1)
+                            write_file("save", cur_lvl_path, level_after_buy)
                             #wert aufsteigen
                             write_file("save", cur_value_path, complete_value_by_next_lvl)
 
@@ -544,14 +552,14 @@ class Game:
             self.draw_text(text3, self.hud_font, 50, LIGHT_GREY, WIDTH/2, shopY + 200, align="center")
 
             #write values
-            self.draw_text(("Aktuelle Stufe: " + "{}".format(cur_lvl)), self.hud_font, 35, YELLOW, acceptX, shopY + 300, align="nw")
+            self.draw_text(("Aktuelle Stufe: " + "{}".format(round(cur_lvl))), self.hud_font, 35, YELLOW, acceptX, shopY + 300, align="nw")
             self.draw_text("{}".format(round(cur_value,2)), self.hud_font, 35, CYAN, acceptX, shopY + 330, align="nw")
 
             self.draw_text("-->", self.hud_font, 35, CYAN, WIDTH / 2, shopY + 300, align="n")
             self.draw_text("{} ".format(cost_to_nxt_lvl) + currency, self.hud_font, 35, ORANGE, WIDTH / 2, shopY + 330, align="n")
-            self.draw_text("+ {}".format(round(value_by_next_lvl,2)), self.hud_font, 35, CYAN, WIDTH / 2, shopY + 360, align="n")
+            self.draw_text("{}".format(round(value_by_next_lvl,2)), self.hud_font, 35, PINK, WIDTH / 2, shopY + 360, align="n")
 
-            self.draw_text(("Naechste Stufe: " + "{}".format(cur_lvl + 1)), self.hud_font, 35, YELLOW, deniedX, shopY + 300, align="nw")
+            self.draw_text(("Naechste Stufe: " + "{}".format(round(cur_lvl + 1))), self.hud_font, 35, YELLOW, deniedX, shopY + 300, align="nw")
             self.draw_text("{}".format(round(complete_value_by_next_lvl,2)), self.hud_font, 35, CYAN, deniedX, shopY + 330, align="nw")
 
 
@@ -586,9 +594,9 @@ class Game:
 
                 value_by_next_lvl = (cur_lvl*2+1)*0.2378+(cur_lvl*2.5)
                 complete_value_by_next_lvl = cur_value + value_by_next_lvl
+                level_after_buy = cur_lvl + 1
 
-
-                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path)
+                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path, level_after_buy)
             if item.type == "health_pack_up":
                 self.buy_cooldown = True
 
@@ -608,8 +616,9 @@ class Game:
                 currency = "XP"
                 value_by_next_lvl = 5
                 complete_value_by_next_lvl = cur_value + value_by_next_lvl
+                level_after_buy = cur_lvl + 1
 
-                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path)
+                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path, level_after_buy)
             if item.type == "auto_reg_up":
                 self.buy_cooldown = True
 
@@ -618,30 +627,47 @@ class Game:
                 text2 = "Regerations Geschwindigkeit"
                 text3 = "\n verbessern?"
 
+                cur_lvl_path = "UPGRADE_LEVEL_auto_reg_up_time"
+                cur_lvl = read_file("save", "UPGRADE_LEVEL_auto_reg_up_time")
 
-
-
-                cur_lvl_path = "UPGRADE_LEVEL_auto_reg_up"
-                cur_lvl = read_file("save", "UPGRADE_LEVEL_auto_reg_up")
-
-                cur_value_path = "UPGRADE_LEVEL_auto_reg_amount"
-                cur_value = read_file("save", "UPGRADE_LEVEL_auto_reg_amount")
+                cur_value_path = "auto_reg_time"
+                cur_value = read_file("save", "auto_reg_time")
 
 
                 cost_to_nxt_lvl = (cur_value*0.5) * cur_value+(cur_lvl*2)
                 cost_to_nxt_lvl = round(cost_to_nxt_lvl)
                 currency = "XP"
-                value_by_next_lvl = 6.5-(cur_lvl/15)*(cur_lvl/100)
+                value_by_next_lvl = 6.5-(cur_lvl/17)*(cur_lvl/100)
 
-                complete_value_by_next_lvl = cur_value + value_by_next_lvl
+                complete_value_by_next_lvl = value_by_next_lvl
+                level_after_buy = cur_lvl+1
 
-                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path)
-
+                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path, level_after_buy)
             if item.type == "auto_reg_amount":
                 self.buy_cooldown = True
-                self.time_start_buy_cooldown = time.time()
+
                 self.shop = True
-                self.create_shop_frame(item)
+                text1 = "Möchtest du deine \n"
+                text2 = "Regerations Kraft"
+                text3 = "\n verbessern?"
+
+                cur_lvl_path = "UPGRADE_LEVEL_auto_reg_amount"
+                cur_lvl = read_file("save", "UPGRADE_LEVEL_auto_reg_amount")
+
+                cur_value_path = "auto_reg_amount"
+                cur_value = read_file("save", "auto_reg_amount")
+
+
+                cost_to_nxt_lvl = (cur_value*0.3) *cur_value/2+(cur_lvl*2.5)
+                cost_to_nxt_lvl = round(cost_to_nxt_lvl)
+                currency = "XP"
+                value_by_next_lvl = 1.5+(cur_lvl*0.77)+(cur_lvl/100)
+
+                complete_value_by_next_lvl = value_by_next_lvl
+                level_after_buy = cur_lvl+1
+
+                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path, level_after_buy)
+
             if item.type == "show_player_hp":
                 self.buy_cooldown = True
                 self.time_start_buy_cooldown = time.time()

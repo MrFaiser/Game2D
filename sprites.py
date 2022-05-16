@@ -55,7 +55,7 @@ class Player(pg.sprite.Sprite):
         self.stamina_reg = read_file("save","stamina_reg")
         self.stamina_cost = read_file("save","stamina_cost")
         self.health = read_file("save","hp")
-        self.auto_reg_up = read_file("save","UPGRADE_LEVEL_auto_reg_up")
+        self.auto_reg_up = read_file("save","UPGRADE_LEVEL_auto_reg_up_time")
         self.auto_reg_amount = read_file("save","UPGRADE_LEVEL_auto_reg_amount")
         self.max_health = read_file("save","max_hp")
         self.weapon = 'pistol'
