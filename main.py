@@ -1,4 +1,5 @@
 import json
+import math
 import time
 from pathlib import Path
 from datetime import datetime
@@ -154,11 +155,12 @@ class Game:
         self.mob_img["zombie_strong"] = pg.image.load(path.join(img_folder, MOBS["zombie_strong"]["mob_img"])).convert_alpha()
 
         #Player Stats Start
-        self.coins = read_file("save","COINS")
+        self.coins = read_file("save","coins")
+        self.xp_lvl = read_file("save","xp")
         self.ammo = read_file("save", "pistol_ammo")
         self.compas_lvl = read_file("save", "compas_lvl")
         self.compas_all = read_file("save", "compas_all")
-        self.current_level = read_file("save", "CURRENT_LEVEL")
+        self.current_level = read_file("save", "current_level")
         #Player Stats End
 
 
@@ -217,8 +219,6 @@ class Game:
             s = pg.mixer.Sound(path.join(snd_folder, snd))
             s.set_volume(0.02)
             self.zombie_hit_sounds.append(s)
-#            self.zombie_hit_sounds.append(pg.mixer.Sound(path.join(snd_folder, snd)))
-
 
     def new(self, level):
         # Write Save File
@@ -271,6 +271,7 @@ class Game:
         self.compas_is_used = False
         self.level_selectet = False
         self.buy_cooldown = False
+        self.health_pack = read_file("save","health_pack")
         self.effects_sounds['level_start'].play().set_volume(0.2)
         self.info_update()
 
@@ -311,10 +312,12 @@ class Game:
                                     Item(self, obj_center, tile_object.name)
                         #Loop End Item Respawn
                     # loop reg start
-                    if self.player.auto_reg_lvl >= 1:
-                        if (time_now - time_start_auto_reg) >= (6.5-(self.player.auto_reg_lvl/17)*(self.player.auto_reg_lvl/100)):
+                    if self.player.auto_reg_up >= 1:
+                        if (time_now - time_start_auto_reg) >= (6.5-(self.player.auto_reg_up/17)*(self.player.auto_reg_up/100)):
                             time_start_auto_reg = time.time()
                             self.player.add_health(1.5 + (self.player.auto_reg_amount/1.8)*(self.player.auto_reg_amount/45))
+                            write_file("save", "hp", self.player.health)
+                            print("reg", self.player.auto_reg_amount)
                     #loop reg end
                     # Buy cooldown start
                     if self.buy_cooldown == True:
@@ -334,7 +337,10 @@ class Game:
 
     def info_update(self):
         self.ammo = read_file("save", self.player.weapon+"_ammo")
-        self.coins = read_file("save", "COINS")
+        self.coins = read_file("save", "coins")
+        self.xp_lvl = read_file("save", "xp")
+        self.player.health = read_file("save", "hp")
+        self.player.max_health = read_file("save", "max_hp")
         print("info update", time.time())
 
     def get_ammo(self):
@@ -358,43 +364,43 @@ class Game:
                 hit.kill()
                 self.home_completed()
             elif hit.type == "doorlvl1":
-                if read_file("save", "CURRENT_LEVEL") >= 1:
+                if read_file("save", "current_level") >= 1:
                     hit.kill()
                     self.enter_level_from_home("lvl1.tmx")
             elif hit.type == "doorlvl2":
-                if read_file("save", "CURRENT_LEVEL") >= 2:
+                if read_file("save", "current_level") >= 2:
                     hit.kill()
                     self.enter_level_from_home("lvl2.tmx")
             elif hit.type == "doorlvl3":
-                if read_file("save", "CURRENT_LEVEL") >= 3:
+                if read_file("save", "current_level") >= 3:
                     hit.kill()
                     self.enter_level_from_home("lvl3.tmx")
             elif hit.type == "doorlvl4":
-                if read_file("save", "CURRENT_LEVEL") >= 4:
+                if read_file("save", "current_level") >= 4:
                     hit.kill()
                     self.enter_level_from_home("lvl4.tmx")
             elif hit.type == "doorlvl5":
-                if read_file("save", "CURRENT_LEVEL") >= 5:
+                if read_file("save", "current_level") >= 5:
                     hit.kill()
                     self.enter_level_from_home("lvl5.tmx")
             elif hit.type == "doorlvl6":
-                if read_file("save", "CURRENT_LEVEL") >= 6:
+                if read_file("save", "current_level") >= 6:
                     hit.kill()
                     self.enter_level_from_home("lvl6.tmx")
             elif hit.type == "doorlvl7":
-                if read_file("save", "CURRENT_LEVEL") >= 7:
+                if read_file("save", "current_level") >= 7:
                     hit.kill()
                     self.enter_level_from_home("lvl7.tmx")
             elif hit.type == "doorlvl8":
-                if read_file("save", "CURRENT_LEVEL") >= 8:
+                if read_file("save", "current_level") >= 8:
                     hit.kill()
                     self.enter_level_from_home("lvl8.tmx")
             elif hit.type == "doorlvl9":
-                if read_file("save", "CURRENT_LEVEL") >= 9:
+                if read_file("save", "current_level") >= 9:
                     hit.kill()
                     self.enter_level_from_home("lvl9.tmx")
             elif hit.type == "doorlvl10":
-                if read_file("save", "CURRENT_LEVEL") >= 10:
+                if read_file("save", "current_level") >= 10:
                     hit.kill()
                     self.enter_level_from_home("lvl10.tmx")
 
@@ -402,7 +408,7 @@ class Game:
             if hit.type == 'health' and self.player.health < self.player.max_health:
                 hit.kill()
                 self.effects_sounds['health_up'].play()
-                self.player.add_health(HEALTH_PACK_AMOUNT)
+                self.player.add_health(self.health_pack)
                 self.info_update()
             if hit.type == "pistol":
                 hit.kill()
@@ -456,16 +462,22 @@ class Game:
                 mob.health -= bullet.damage
             mob.vel = vec(0, 0)
 
-    def create_shop_frame(self, item):
-        sizeX = 160
+    def create_shop_frame(self, item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl, cur_lvl_path, cur_value_path):
+        sizeX = 200
         sizeY = 50
 
-        acceptX = 100
-        acceptY = 500
+        #acceptX = 100
+        acceptX = WIDTH/2-100-sizeX-100
+        acceptY = 550
 
-        deniedX = WIDTH - 200 - sizeX
-        deniedY = 500
+        deniedX = WIDTH/2+100
+        deniedY = 550
 
+
+        shopY = 50
+
+        trennlinie = "--------------------------------------------------------------------------" \
+                     "--------------------------------------------------------------------------"
 
         self.screen.blit(self.dim_screen, (0, 0))
 
@@ -478,12 +490,30 @@ class Game:
                 if ev.type == pygame.MOUSEBUTTONDOWN:
                     #accept
                     if acceptX <= mouse[0] <= acceptX + sizeX and acceptY <= mouse[1] <= acceptY + sizeY:
-                        print("yess", item.type)
-                        self.shop = False
+                        konto = read_file("save", currency.lower())
+                        if konto >= cost_to_nxt_lvl:
+                            self.shop = False
+                            self.time_start_buy_cooldown = time.time()
+                            print("Buy:", item.type, cost_to_nxt_lvl, currency, " from ", cur_lvl, " to ", cur_lvl+1)
+                            #currency abziehen
+                            write_file("save", currency.lower(), konto-cost_to_nxt_lvl)
+                            #lvl aufsteigen
+                            write_file("save", cur_lvl_path, cur_lvl+1)
+                            #wert aufsteigen
+                            write_file("save", cur_value_path, complete_value_by_next_lvl)
+
+                            self.info_update()
+                        else:
+                            print("nicht genug")
+                            print("konto", konto)
+                            print("kosten", cost_to_nxt_lvl)
+                            self.draw_text(("Nicht genug " + currency), self.hud_font, 28, LIGHT_RED, acceptX + 10, acceptY-25, align="sw")
+
                     #denied
                     if deniedX <= mouse[0] <= deniedX + sizeX and deniedY <= mouse[1] <= deniedY + sizeY:
                         print("nein", item.type)
                         self.shop = False
+                        self.time_start_buy_cooldown = time.time()
 
 
             mouse = pygame.mouse.get_pos()
@@ -505,10 +535,30 @@ class Game:
 
 
 
-            self.draw_text("SHOP", self.title_font, 105, ORANGE, WIDTH / 2, 50, align="center")
-            self.draw_text(item.type, self.hud_font, 70, RED, WIDTH/2, 200, align="center")
-            self.draw_text("accept", self.hud_font, 40, GREEN, acceptX+5, acceptY, align="nw")
-            self.draw_text("denied", self.hud_font, 40, RED, deniedX+5, deniedY, align="nw")
+            self.draw_text("SHOP", self.title_font, 105, ORANGE, WIDTH / 2, shopY, align="center")
+            self.draw_text(trennlinie, self.title_font, 10, LIGHT_GREY, WIDTH / 2, shopY+50, align="center")
+
+            #write text
+            self.draw_text(text1, self.hud_font, 50, LIGHT_GREY, WIDTH/2, shopY + 100, align="center")
+            self.draw_text(text2, self.hud_font, 55, CYAN, WIDTH/2, shopY + 150, align="center")
+            self.draw_text(text3, self.hud_font, 50, LIGHT_GREY, WIDTH/2, shopY + 200, align="center")
+
+            #write values
+            self.draw_text(("Aktuelle Stufe: " + "{}".format(cur_lvl)), self.hud_font, 35, YELLOW, acceptX, shopY + 300, align="nw")
+            self.draw_text("{}".format(round(cur_value,2)), self.hud_font, 35, CYAN, acceptX, shopY + 330, align="nw")
+
+            self.draw_text("-->", self.hud_font, 35, CYAN, WIDTH / 2, shopY + 300, align="n")
+            self.draw_text("{} ".format(cost_to_nxt_lvl) + currency, self.hud_font, 35, ORANGE, WIDTH / 2, shopY + 330, align="n")
+            self.draw_text("+ {}".format(round(value_by_next_lvl,2)), self.hud_font, 35, CYAN, WIDTH / 2, shopY + 360, align="n")
+
+            self.draw_text(("Naechste Stufe: " + "{}".format(cur_lvl + 1)), self.hud_font, 35, YELLOW, deniedX, shopY + 300, align="nw")
+            self.draw_text("{}".format(round(complete_value_by_next_lvl,2)), self.hud_font, 35, CYAN, deniedX, shopY + 330, align="nw")
+
+
+            #write answer
+            self.draw_text(trennlinie, self.title_font, 10, LIGHT_GREY, WIDTH / 2, acceptY-10, align="center")
+            self.draw_text("Kaufen", self.hud_font, 40, GREEN, acceptX + 30, acceptY, align="nw")
+            self.draw_text("Ablehnen", self.hud_font, 40, RED, deniedX + 10, deniedY, align="nw")
             pg.display.update()
 
 
@@ -516,19 +566,77 @@ class Game:
         if self.buy_cooldown == False:
             if item.type == "max_health_up":
                 self.buy_cooldown = True
-                self.time_start_buy_cooldown = time.time()
+
                 self.shop = True
-                self.create_shop_frame(item)
+                text1 = "Möchtest du deine \n"
+                text2 = "Maximale Gesundheit"
+                text3 = "\n verbessern?"
+
+
+                cur_lvl_path = "UPGRADE_LEVEL_max_health_up"
+                cur_lvl = read_file("save", "UPGRADE_LEVEL_max_health_up")
+
+                cur_value_path = "max_hp"
+                cur_value = read_file("save", "max_hp")
+
+                cost_to_nxt_lvl = (cur_lvl * math.pi) + cur_lvl * (cur_lvl/15)
+                cost_to_nxt_lvl = round(cost_to_nxt_lvl)
+
+                currency = "XP"
+
+                value_by_next_lvl = (cur_lvl*2+1)*0.2378+(cur_lvl*2.5)
+                complete_value_by_next_lvl = cur_value + value_by_next_lvl
+
+
+                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path)
             if item.type == "health_pack_up":
                 self.buy_cooldown = True
-                self.time_start_buy_cooldown = time.time()
+
                 self.shop = True
-                self.create_shop_frame(item)
+                text1 = "Möchtest du die \n"
+                text2 = "Erste-Hilfe Packs"
+                text3 = "\n verbessern?"
+
+                cur_lvl_path = "UPGRADE_LEVEL_health_pack_up"
+                cur_lvl = read_file("save", "UPGRADE_LEVEL_health_pack_up")
+
+                cur_value_path = "health_pack"
+                cur_value = read_file("save", "health_pack")
+
+                cost_to_nxt_lvl = (cur_lvl * 2.2) + 1
+                cost_to_nxt_lvl = round(cost_to_nxt_lvl)
+                currency = "XP"
+                value_by_next_lvl = 5
+                complete_value_by_next_lvl = cur_value + value_by_next_lvl
+
+                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path)
             if item.type == "auto_reg_up":
                 self.buy_cooldown = True
-                self.time_start_buy_cooldown = time.time()
+
                 self.shop = True
-                self.create_shop_frame(item)
+                text1 = "Möchtest du deine \n"
+                text2 = "Regerations Geschwindigkeit"
+                text3 = "\n verbessern?"
+
+
+
+
+                cur_lvl_path = "UPGRADE_LEVEL_auto_reg_up"
+                cur_lvl = read_file("save", "UPGRADE_LEVEL_auto_reg_up")
+
+                cur_value_path = "UPGRADE_LEVEL_auto_reg_amount"
+                cur_value = read_file("save", "UPGRADE_LEVEL_auto_reg_amount")
+
+
+                cost_to_nxt_lvl = (cur_value*0.5) * cur_value+(cur_lvl*2)
+                cost_to_nxt_lvl = round(cost_to_nxt_lvl)
+                currency = "XP"
+                value_by_next_lvl = 6.5-(cur_lvl/15)*(cur_lvl/100)
+
+                complete_value_by_next_lvl = cur_value + value_by_next_lvl
+
+                self.create_shop_frame(item, text1,text2, text3, cur_lvl, cur_value, cost_to_nxt_lvl, currency, value_by_next_lvl, complete_value_by_next_lvl,cur_lvl_path,cur_value_path)
+
             if item.type == "auto_reg_amount":
                 self.buy_cooldown = True
                 self.time_start_buy_cooldown = time.time()
@@ -588,17 +696,18 @@ class Game:
 
         # HUD functions
         draw_player_health(self.screen, 10, 10, self.player.health / self.player.max_health)
-        self.draw_text("HP: {}".format(round(self.player.health,2)) + " / {}".format(self.player.max_health), self.hud_font, 15, DARK_GREY, 15, 25, align="w")
+        self.draw_text("HP: {}".format(round(self.player.health, 2)) + " / {}".format(round(self.player.max_health,2)), self.hud_font, 15, DARK_GREY, 15, 25, align="w")
         draw_player_stamina(self.screen, 10, 45, self.player.stamina / self.player.max_stamina, self.player.out_of_stamina)
-        self.draw_text("ST: {}".format(round(self.player.stamina,2)) + " / {}".format(self.player.max_stamina), self.hud_font, 15, DARK_GREY, 15, 55, align="w")
+        self.draw_text("ST: {}".format(round(self.player.stamina, 2)) + " / {}".format(self.player.max_stamina), self.hud_font, 15, DARK_GREY, 15, 55, align="w")
 
 
-        self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 155, align="w")
-        self.draw_text("Coins: {}".format(self.coins), self.hud_font, 30, ORANGE, 10, 185, align="w")
-        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(self.ammo), self.hud_font, 30, DARK_GREY, 10, 115, align="w")
-     #   self.draw_text("Ammo: {}".format(ammo) , self.hud_font, 30, DARKGREY, 10, 140, align="w")
 
-        self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, LIGHT_GREY, WIDTH - 50, 10,align="center")
+        self.draw_text("Weapon: {}".format(self.player.weapon) + " x {}".format(self.ammo), self.hud_font, 30,DARK_GREY, 10, 100, align="w")
+        self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 130, align="w")
+        self.draw_text("Coins: {}".format(self.coins), self.hud_font, 30, ORANGE, 10, 160, align="w")
+        self.draw_text("XP lvl: {}".format(self.xp_lvl) , self.hud_font, 30, YELLOW, 10, 190, align="w")
+
+        self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, BLACK, WIDTH - 50, 10,align="center")
 
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
@@ -647,8 +756,8 @@ class Game:
                     self.night = not self.night
                 if event.key == pg.K_0:
                     self.info_update()
-                    write_file("save", "COINS", read_file("save","COINS")+2)
-                    self.coins = read_file("save", "COINS")
+                    write_file("save", "coins", read_file("save","coins")+2)
+                    self.coins = read_file("save", "coins")
                     print("+2 Coins")
                     self.get_ammo()
                     self.player.max_health = 1000
@@ -711,8 +820,8 @@ class Game:
         pg.display.flip()
         self.wait_for_key()
         if not self.level_selectet:
-            self.current_level = read_file("save", "CURRENT_LEVEL") + 1
-            write_file("save", "CURRENT_LEVEL", self.current_level)
+            self.current_level = read_file("save", "current_level") + 1
+            write_file("save", "current_level", self.current_level)
 
         self.new("home.tmx")
 
@@ -727,7 +836,7 @@ class Game:
         self.wait_for_key()
 
         try:
-            self.new(MAPS[read_file("save", "CURRENT_LEVEL") + 1])
+            self.new(MAPS[read_file("save", "current_level") + 1])
         except:
             self.new("home.tmx")
 

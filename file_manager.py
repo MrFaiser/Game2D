@@ -4,19 +4,29 @@ import sprites
 
 data = {
     'save': [
-        {
-            'NAME': "user",
-            'CURRENT_LEVEL': -1,
-            'COINS': 0,
-            "sprint_speed": 2,
+        {   #player stats
+            'name': "user",
+            'current_level': -1,
+            'coins': 0,
+            'xp': 0,
+            'xp_points': 0,
+            "sprint_speed": 1.5,
             "hp": 20,
             "max_hp": 20,
-            "auto_reg_lvl": 0,
-            "auto_reg_amount": 1,
+            "health_pack": 20,
             "stamina": 30,
             "max_stamina": 30,
             "stamina_reg": 0.1,
             "stamina_cost": 1,
+
+            #upgrade lvl
+            "UPGRADE_LEVEL_max_health_up": 0,
+            "UPGRADE_LEVEL_health_pack_up": 0,
+            "UPGRADE_LEVEL_auto_reg_up": 0,
+            "UPGRADE_LEVEL_auto_reg_amount": 0,
+            "UPGRADE_LEVEL_show_player_hp": 0,
+
+            #Weapon
             "pistol_ammo": 25,
             "shotgun_ammo": -1,
             "sniper_ammo": -1,
@@ -32,6 +42,7 @@ data = {
 
 def create_file():
     if(os.stat("savefiles/data.json").st_size == 0):
+        print("c")
         with open('savefiles/data.json', 'w') as File:
             File.write(json.dumps(data, indent = 4))
             print(data)
@@ -41,6 +52,7 @@ def create_file():
 
 
 def read_file(region, key):
+    print("r", key)
     with open('savefiles/data.json', 'r') as File:
         daten = json.load(File)
         for i in daten[region]:
@@ -48,6 +60,7 @@ def read_file(region, key):
         return result
 
 def write_file(region, key, wert):
+    print("w", key, wert)
     with open("savefiles/data.json", "r") as File:
         data = json.load(File)
 

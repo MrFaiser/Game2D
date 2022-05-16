@@ -10,6 +10,7 @@ LIGHT_GREY = (180, 180, 180)
 GREEN = (0, 255, 0)
 DARK_GREEN = (0, 100, 0)
 RED = (255, 0, 0)
+LIGHT_RED = (255, 100, 100)
 YELLOW = (255, 255, 0)
 BLUE = (0, 0, 255)
 LiGHT_BLUE = (80, 80, 255)
@@ -21,7 +22,7 @@ PINK = (255,105,180)
 # game settings
 WIDTH = 1000   # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
-FPS = 60
+FPS = 120
 TITLE = "Titelfenster lol"
 BGCOLOR = BROWN
 
@@ -194,10 +195,10 @@ LVL_IMAGES = {'door_auto': 'door_enter.png',
 
 
 
-HEALTH_PACK_AMOUNT = 20
-ITEM_RESPAWN_TIME = 10# 3*60
-BOB_RANGE = 15
-BOB_SPEED = 0.1
+#HEALTH_PACK_AMOUNT = 20
+ITEM_RESPAWN_TIME = 3*60
+BOB_RANGE = 20
+BOB_SPEED = 0.8
 
 # Sounds
 BG_MUSIC = 'calm2.ogg'
