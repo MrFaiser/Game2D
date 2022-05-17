@@ -133,7 +133,7 @@ ITEMS_LAYER = 1
 # Items
 ITEM_LIST = []
 ITEM_LIST= ['health',
-            "max_health_up", "health_pack_up", "auto_reg_up", "auto_reg_amount", "show_player_hp"
+            "max_health_up", "health_pack_up", "auto_reg_up", "auto_reg_amount", "show_player_hp",
             "pistol", "shotgun", "sniper", "rifle"]
 ITEM_IMAGES = {'health': 'health_pack.png',
 
@@ -141,7 +141,7 @@ ITEM_IMAGES = {'health': 'health_pack.png',
                "health_pack_up": "health_pack_up.png",
                "auto_reg_up": "auto_reg_up.png",
                "auto_reg_amount": "auto_reg_amount.png",
-               #"show_player_hp": "show_player_hp.png",
+               "show_player_hp": "show_player_hp.png",
 
                "pistol": "pistol.png",
                "shotgun": "shotgun.png",

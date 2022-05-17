@@ -118,8 +118,9 @@ class Player(pg.sprite.Sprite):
 
     def shoot(self):
         now = pg.time.get_ticks()
-        if read_file("save", self.weapon+"_ammo") > 0:
-            if now - self.last_shot > WEAPONS[self.weapon]['rate']:
+        if now - self.last_shot > WEAPONS[self.weapon]['rate']:
+            if read_file("save", self.weapon+"_ammo") > 0:
+            #if now - self.last_shot > WEAPONS[self.weapon]['rate']:
                 write_file("save", self.weapon+"_ammo", read_file("save", self.weapon+"_ammo") - 1)
                 self.game.info_update()
                 self.last_shot = now
