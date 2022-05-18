@@ -22,7 +22,7 @@ PINK = (255,105,180)
 # game settings
 WIDTH = 1000   # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
-FPS = 120
+FPS = 60
 TITLE = "Titelfenster lol"
 BGCOLOR = BROWN
 
@@ -32,7 +32,7 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 
 # Player settings
 #PLAYER_HEALTH = 20
-PLAYER_SPEED =280
+PLAYER_SPEED = 280
 PLAYER_ROT_SPEED = 200
 PLAYER_IMG = 'manBlue_gun.png'
 PLAYER_HIT_RECT = pg.Rect(0, 0, 35, 35)
@@ -97,6 +97,7 @@ MOBS["zombie"] = {"mob_img": "zombie1_hold.png",
                   "mob_knockback": 20,
                   "avoid_radius":20,
                   "detect_radius":400,
+                  "xp_reward":10,
                   "coin_reward":1}
 MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "mob_speed": [200, 10],
@@ -106,6 +107,7 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "mob_knockback": 40,
                   "avoid_radius":20,
                   "detect_radius":200,
+                  "xp_reward":70,
                   "coin_reward": 2}
 
 
@@ -198,7 +200,7 @@ LVL_IMAGES = {'door_auto': 'door_enter.png',
 #HEALTH_PACK_AMOUNT = 20
 ITEM_RESPAWN_TIME = 3*60
 BOB_RANGE = 20
-BOB_SPEED = 0.8
+BOB_SPEED = 0.6
 
 # Sounds
 BG_MUSIC = 'calm2.ogg'

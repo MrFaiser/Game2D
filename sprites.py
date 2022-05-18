@@ -230,6 +230,8 @@ class Mob(pg.sprite.Sprite):
             self.game.map_img.blit(self.game.splat, self.pos - vec(32, 32))
             write_file("save", "coins", read_file("save", "coins") + MOBS[self.type]["coin_reward"])
             self.game.info_update()
+            self.game.get_xp(MOBS[self.type]["xp_reward"])
+
 
     def draw_health(self):
         pct = MOBS[self.type]["mob_health"]

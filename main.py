@@ -157,6 +157,7 @@ class Game:
         #Player Stats Start
         self.coins = read_file("save","coins")
         self.xp_lvl = read_file("save","xp")
+        self.xp_points = read_file("save", "xp_points")
         self.ammo = read_file("save", "pistol_ammo")
         self.compas_lvl = read_file("save", "compas_lvl")
         self.compas_all = read_file("save", "compas_all")
@@ -729,9 +730,6 @@ class Game:
                                            value_by_next_lvl, complete_value_by_next_lvl, cur_lvl_path, cur_value_path,
                                            level_after_buy, False)
 
-
-
-
     def draw_grid(self):
         for x in range(0, WIDTH, TILESIZE):
             pg.draw.line(self.screen, LIGHT_GREY, (x, 0), (x, HEIGHT))
@@ -797,6 +795,39 @@ class Game:
             self.draw_text("press Esc to play", self.hud_font, 105, GREEN, WIDTH / 2, HEIGHT * 3 / 4, align="center")
 
         pg.display.flip()
+
+############################################################
+
+    def reverse(self, lvl, xp):
+        print("+++++++++++++++++")
+        print("xp", xp)
+        print("cur xp", self.xp_points)
+        print("+++++++++++++++++")
+
+
+        xp_needet = 24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8
+
+        while xp >= xp_needet:
+            xp_needet = 24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8
+            self.xp_lvl = self.xp_lvl + 1
+            xp = xp - xp_needet
+            print("xp",xp)
+            print("cur xp",self.xp_points)
+            print("xp needet",xp_needet)
+        write_file("save", "xp_points", xp)
+        write_file("save", "xp", self.xp_lvl)
+
+##################################
+    def get_xp(self, xp):
+        print("-----------------")
+        print("cur xp", self.xp_points)
+        print("cur xp lvl", self.xp_lvl)
+        print("added xp", xp)
+        print("xp needed", 24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
+        print("-----------------")
+        self.reverse(self.xp_lvl, self.xp_points + xp)
+        write_file("save", "xp_points", xp)
+        pass
 
     def use_compas(self):
         dist_all = []
