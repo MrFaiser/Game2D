@@ -164,6 +164,7 @@ class Player(pg.sprite.Sprite):
         self.health += amount
         if self.health > self.max_health:
             self.health = self.max_health
+        write_file("save","hp", self.health)
 
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y, type):

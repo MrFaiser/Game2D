@@ -303,7 +303,7 @@
   <object id="1033" name="zombie" x="930" y="672" width="32" height="32"/>
   <object id="1040" name="zombie" x="2864" y="1760" width="32" height="32"/>
   <object id="1041" name="zombie" x="2992" y="1824" width="32" height="32"/>
-  <object id="1042" name="zombie_strong" x="2736" y="1824" width="32" height="32"/>
+  <object id="1042" name="zombie_strong" x="2768" y="720" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="13" name="gun obj">
   <object id="940" name="sniper" x="2576" y="1872" width="32" height="32"/>

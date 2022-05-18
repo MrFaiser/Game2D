@@ -154,6 +154,10 @@ class Game:
         self.mob_img["zombie"] = pg.image.load(path.join(img_folder, MOBS["zombie"]["mob_img"])).convert_alpha()
         self.mob_img["zombie_strong"] = pg.image.load(path.join(img_folder, MOBS["zombie_strong"]["mob_img"])).convert_alpha()
 
+#        self.npc_img = {}
+#        self.npc_img["npc"] = pg.image.load(path.join(img_folder, NPCS["npc"]["mob_img"])).convert_alpha()
+#        self.npc_img["npc_gun"] = pg.image.load(path.join(img_folder, NPCS["npc_gun"]["mob_img"])).convert_alpha()
+
         #Player Stats Start
         self.coins = read_file("save","coins")
         self.xp_lvl = read_file("save","xp")
@@ -227,6 +231,7 @@ class Game:
         self.all_sprites = pg.sprite.LayeredUpdates()
         self.walls = pg.sprite.Group()
         self.mobs = pg.sprite.Group()
+        self.npcs = pg.sprite.Group()
         self.bullets = pg.sprite.Group()
         self.players = pg.sprite.Group()
         self.items = pg.sprite.Group()
@@ -797,37 +802,23 @@ class Game:
         pg.display.flip()
 
 ############################################################
-
-    def reverse(self, lvl, xp):
-        print("+++++++++++++++++")
-        print("xp", xp)
-        print("cur xp", self.xp_points)
-        print("+++++++++++++++++")
-
-
-        xp_needet = 24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8
-
-        while xp >= xp_needet:
-            xp_needet = 24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8
-            self.xp_lvl = self.xp_lvl + 1
-            xp = xp - xp_needet
-            print("xp",xp)
-            print("cur xp",self.xp_points)
-            print("xp needet",xp_needet)
-        write_file("save", "xp_points", xp)
-        write_file("save", "xp", self.xp_lvl)
+    def truncate(self, n, decimals=0):
+        multiplier = 10 ** decimals
+        return int(n * multiplier) / multiplier
 
 ##################################
     def get_xp(self, xp):
-        print("-----------------")
-        print("cur xp", self.xp_points)
-        print("cur xp lvl", self.xp_lvl)
-        print("added xp", xp)
-        print("xp needed", 24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
-        print("-----------------")
-        self.reverse(self.xp_lvl, self.xp_points + xp)
-        write_file("save", "xp_points", xp)
-        pass
+        xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
+        self.xp_points = self.xp_points + xp
+        for i in range(int(self.truncate((self.xp_points) / xp_needed))):
+            print(i)
+            self.xp_lvl = self.xp_lvl + 1
+            self.xp_points = self.xp_points % xp_needed
+            xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
+
+            write_file("save", "xp", self.xp_lvl)
+            write_file("save", "xp_points", self.xp_points)
+
 
     def use_compas(self):
         dist_all = []
@@ -865,6 +856,8 @@ class Game:
                     self.draw_debug = not self.draw_debug
                 if event.key == pg.K_ESCAPE:
                     self.paused = not self.paused
+                if event.key == pg.K_o:
+                    self.show_go_screen()
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:

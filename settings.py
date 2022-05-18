@@ -26,7 +26,7 @@ FPS = 60
 TITLE = "Titelfenster lol"
 BGCOLOR = BROWN
 
-TILESIZE = 62
+TILESIZE = 1000
 GRIDWIDTH = WIDTH / TILESIZE
 GRIDHEIGHT = HEIGHT / TILESIZE
 
@@ -107,7 +107,30 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "mob_knockback": 40,
                   "avoid_radius":20,
                   "detect_radius":200,
-                  "xp_reward":70,
+                  "xp_reward":23.8,
+                  "coin_reward": 2}
+
+NPCS = {}
+NPCS["npc"] = {"npc_img": "npc.png",
+                  "npc_speed": [150, 100, 75, 125],
+                  "npc_hit_rect": pg.Rect(0, 0, 30, 30),
+                  "npc_health": 100,
+                  "npc_damage": 8,
+                  "npc_knockback": 20,
+                  "avoid_radius":20,
+                  "detect_radius":400,
+                  "xp_reward":10,
+                  "coin_reward":1}
+
+NPCS["npc_gun"] = {"npc_img": "npc_gun.png",
+                  "npc_speed": [200, 10],
+                  "npc_hit_rect": pg.Rect(0, 0, 30, 30),
+                  "npc_health": 400,
+                  "npc_damage": 20,
+                  "npc_knockback": 40,
+                  "avoid_radius":20,
+                  "detect_radius":200,
+                  "xp_reward":23.8,
                   "coin_reward": 2}
 
 
@@ -128,6 +151,7 @@ WALL_LAYER = 1
 PLAYER_LAYER = 2
 BULLET_LAYER = 3
 MOB_LAYER = 2
+NPC_LAYER = 2
 EFFECTS_LAYER = 4
 ITEMS_LAYER = 1
 
