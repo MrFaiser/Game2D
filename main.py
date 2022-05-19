@@ -154,9 +154,9 @@ class Game:
         self.mob_img["zombie"] = pg.image.load(path.join(img_folder, MOBS["zombie"]["mob_img"])).convert_alpha()
         self.mob_img["zombie_strong"] = pg.image.load(path.join(img_folder, MOBS["zombie_strong"]["mob_img"])).convert_alpha()
 
-#        self.npc_img = {}
-#        self.npc_img["npc"] = pg.image.load(path.join(img_folder, NPCS["npc"]["mob_img"])).convert_alpha()
-#        self.npc_img["npc_gun"] = pg.image.load(path.join(img_folder, NPCS["npc_gun"]["mob_img"])).convert_alpha()
+        self.npc_img = {}
+        self.npc_img["npc"] = pg.image.load(path.join(img_folder, NPCS["npc"]["npc_img"])).convert_alpha()
+        self.npc_img["npc_gun"] = pg.image.load(path.join(img_folder, NPCS["npc_gun"]["npc_img"])).convert_alpha()
 
         #Player Stats Start
         self.coins = read_file("save","coins")

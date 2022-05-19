@@ -31,8 +31,6 @@ def collide_with_walls(sprite, group, dir):
             sprite.vel.y = 0
             sprite.hit_rect.centery = sprite.pos.y
 
-
-
 class Player(pg.sprite.Sprite):
     def __init__(self, game, x, y):
         self._layer = PLAYER_LAYER
@@ -247,6 +245,86 @@ class Mob(pg.sprite.Sprite):
         if self.health < MOBS[self.type]["mob_health"]:
             pg.draw.rect(self.image, col, self.health_bar)
 
+class NPC(pg.sprite.Sprite):
+    def __init__(self, game, x, y, type):
+        self._layer = NPC_LAYER
+        self.groups = game.all_sprites, game.npcs
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.game = game
+        self.image = game.npc_img[type].copy()
+        #EDIT-----------------------------------
+        self.rect = self.image.get_rect()
+        self.rect.center = (x, y)
+        self.type = type
+        self.name = type
+        self.hit_rect = NPCS[self.type]["npc_hit_rect"].copy()
+        self.hit_rect.center = self.rect.center
+        self.pos = vec(x, y)
+        self.vel = vec(0, 0)
+        self.acc = vec(0, 0)
+        self.rect.center = self.pos
+        self.rot = 0
+        self.health = NPCS[self.type]["npc_health"]
+        self.speed = choice(NPCS[self.type]["npc_speed"])
+        self.target = game.player
+
+
+    def avoid_npcs(self):
+        for npc in self.game.npcs:
+            if npc != self:
+                dist = self.pos - npc.pos
+                if 0 < dist.length() < NPCS[self.type]["avoid_radius"]:
+                    self.acc += dist.normalize()
+
+    def update(self):
+        target_dist = self.target.pos - self.pos
+        if target_dist.length_squared() < NPCS[self.type]["detect_radius"]**2:
+
+#            if random() < 0.008:
+#                choice(self.game.zombie_moan_sounds).play()
+            self.rot = target_dist.angle_to(vec(1, 0))
+            self.image = pg.transform.rotate(self.game.npc_img[self.type], self.rot)
+
+            self.rect.center = self.pos
+            self.acc = vec(1, 0).rotate(-self.rot)
+            self.avoid_npcs()
+            self.acc.scale_to_length(self.speed)
+            self.acc += self.vel * -1
+            self.vel += self.acc * self.game.dt
+            self.pos += self.vel * self.game.dt + 0.5 * self.acc * self.game.dt ** 2
+            self.hit_rect.centerx = self.pos.x
+            collide_with_walls(self, self.game.walls, 'x')
+            self.hit_rect.centery = self.pos.y
+            collide_with_walls(self, self.game.walls, 'y')
+            self.rect.center = self.hit_rect.center
+
+ #           if self.pos.x >= WIDTH:
+#                print(self.pos.x-WIDTH)
+
+#            print(self.pos.x)
+
+           #pg.draw
+        if self.health <= 0:
+            choice(self.game.zombie_hit_sounds).play()
+            self.kill()
+            self.game.map_img.blit(self.game.splat, self.pos - vec(32, 32))
+            write_file("save", "coins", read_file("save", "coins") + NPCS[self.type]["coin_reward"])
+            self.game.info_update()
+            self.game.get_xp(NPCS[self.type]["xp_reward"])
+
+
+    def draw_health(self):
+        pct = NPCS[self.type]["npc_health"]
+        if self.health >= pct * 0.8:
+            col = GREEN
+        elif self.health >= pct * 0.3:
+            col = YELLOW
+        else:
+            col = RED
+        width = int(self.rect.width * self.health / NPCS[self.type]["npc_health"])
+        self.health_bar = pg.Rect(0, 0, width, 7)
+        if self.health < NPCS[self.type]["npc_health"]:
+            pg.draw.rect(self.image, col, self.health_bar)
 
 class Bullet(pg.sprite.Sprite):
     def __init__(self, game, pos, dir, damage):
