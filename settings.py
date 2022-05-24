@@ -33,9 +33,9 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 # Player settings
 #PLAYER_HEALTH = 20
 PLAYER_SPEED = 280
-PLAYER_ROT_SPEED = 200
+PLAYER_ROT_SPEED = 300
 PLAYER_IMG = 'manBlue_gun.png'
-PLAYER_HIT_RECT = pg.Rect(0, 0, 35, 35)
+PLAYER_HIT_RECT = pg.Rect(0, 0, 40, 40)
 BARREL_OFFSET = vec(30, 10)
 
 # Weapon settings
@@ -112,7 +112,7 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
 
 NPCS = {}
 NPCS["npc"] = {"npc_img": "npc.png",
-                  "npc_speed": [150, 100, 75, 125],
+                  "npc_speed": [0],
                   "npc_hit_rect": pg.Rect(0, 0, 30, 30),
                   "npc_health": 100,
                   "npc_damage": 0,

@@ -3,6 +3,8 @@ import math
 import time
 from pathlib import Path
 from datetime import datetime
+
+import pygame
 import pygame as pg
 import sys
 from random import choice, random
@@ -251,6 +253,8 @@ class Game:
                              tile_object.y + tile_object.height / 2)
             if tile_object.name == 'player':
                 self.player = Player(self, obj_center.x, obj_center.y)
+            if tile_object.name == 'npc':
+                self.npc = Npc(self, obj_center.x, obj_center.y, "npc")
             if tile_object.name == 'zombie':
                 self.mob = Mob(self, obj_center.x, obj_center.y, "zombie")
             if tile_object.name == 'zombie_strong':
@@ -447,6 +451,15 @@ class Game:
 
             self.buy_upgrade(hit)
 
+
+
+        #  player hit npc
+
+        #hit2 = pg.sprite.spritecollide(self.player, self.npcs, False, collide_hit_rect)
+        #         hit4 = pg.sprite.groupcollide(self.players, self.npcs, False, False)
+        #     #    print("2",hit2)
+        #      #   print("4",hit4)
+
         # mobs hit player
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
         zombie_type = ""
@@ -463,7 +476,7 @@ class Game:
                 self.playing = False
         if hits:
             self.player.hit()
-            self.player.pos += vec(MOBS[zombie_type]["mob_knockback"], 0).rotate(-self.player.rot+180)
+            self.player.pos += vec(MOBS[zombie_type]["mob_knockback"], 0).rotate(self.player.rot)#+180)
 #
         # bullets hit mobs
         hits = pg.sprite.groupcollide(self.mobs, self.bullets, False, True)
@@ -758,6 +771,7 @@ class Game:
             self.screen.blit(sprite.image, self.camera.apply(sprite))
             if self.draw_debug:
                 pg.draw.rect(self.screen, CYAN, self.camera.apply_rect(sprite.hit_rect), 1)
+                pg.draw.rect(self.screen, RED, self.camera.apply_rect(sprite.rect), 1)
 
                 ###
                 if sprite.type == "zombie" or sprite.type == "zombie_strong":
@@ -844,6 +858,24 @@ class Game:
                 except:
                     pass
 
+    def nearest_npc(self):
+
+        dist_all = []
+        for sprite in self.all_sprites:
+            if sprite.type == "npc" or sprite.type == "npc_gun":
+                dist = self.player.pos - sprite.pos
+                dist_all.append(dist.length())
+        try:
+            nearest_npc = dist_all[0]
+            for v in dist_all:
+                if v < nearest_npc:
+                    nearest_npc = v
+            if nearest_npc <= 100:
+                print("chat")
+
+        except:
+            pass
+
     def events(self):
         # catch all events here
         for event in pg.event.get():
@@ -858,6 +890,11 @@ class Game:
                     self.paused = not self.paused
                 if event.key == pg.K_o:
                     self.show_go_screen()
+                if event.key == pg.K_e:
+                    print("interact")
+                    self.nearest_npc()
+
+
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:

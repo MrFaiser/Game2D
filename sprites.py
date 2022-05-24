@@ -1,10 +1,6 @@
-import pygame
-import pygame as pg
-import math
 from random import uniform, choice, randint, random
 from settings import *
 from tilemap import collide_hit_rect
-import pytweening
 import pytweening as tween
 from itertools import chain
 from file_manager import *
@@ -47,23 +43,21 @@ class Player(pg.sprite.Sprite):
         self.pos = vec(x, y)
         self.rot = 0
         self.last_shot = 0
-        self.sprint_speed = read_file("save","sprint_speed")
-        self.stamina = read_file("save","stamina")
-        self.max_stamina = read_file("save","max_stamina")
-        self.stamina_reg = read_file("save","stamina_reg")
-        self.stamina_cost = read_file("save","stamina_cost")
-        self.health = read_file("save","hp")
-        self.auto_reg_up = read_file("save","UPGRADE_LEVEL_auto_reg_up_time")
-        self.auto_reg_amount = read_file("save","UPGRADE_LEVEL_auto_reg_amount")
-        self.max_health = read_file("save","max_hp")
+        self.sprint_speed = read_file("save", "sprint_speed")
+        self.stamina = read_file("save", "stamina")
+        self.max_stamina = read_file("save", "max_stamina")
+        self.stamina_reg = read_file("save", "stamina_reg")
+        self.stamina_cost = read_file("save", "stamina_cost")
+        self.health = read_file("save", "hp")
+        self.auto_reg_up = read_file("save", "UPGRADE_LEVEL_auto_reg_up_time")
+        self.auto_reg_amount = read_file("save", "UPGRADE_LEVEL_auto_reg_amount")
+        self.max_health = read_file("save", "max_hp")
         self.weapon = 'pistol'
         self.damaged = False
         self.out_of_stamina = False
         self.sprinting = False
 
     def get_keys(self):
-        global test
-        global down
         self.rot_speed = 0
         self.vel = vec(0, 0)
         keys = pg.key.get_pressed()
@@ -87,13 +81,13 @@ class Player(pg.sprite.Sprite):
         if keys[pg.K_SPACE]:
             self.shoot()
 
-        #Rennen & Audauer
+        # Rennen & Audauer
         if keys[pg.K_LSHIFT] or keys[pg.K_RSHIFT]:
             if self.stamina > 0:
                 if self.out_of_stamina == False:
                     self.vel = vec(PLAYER_SPEED * self.sprint_speed, 0).rotate(-self.rot)
                     self.stamina = self.stamina - self.stamina_cost
-                    self.sprinting =True
+                    self.sprinting = True
                     if self.stamina <= 0:
                         self.out_of_stamina = True
                         self.sprinting = False
@@ -110,16 +104,16 @@ class Player(pg.sprite.Sprite):
         else:
             self.stamina = self.max_stamina
             self.out_of_stamina = False
-        #Sound stop
+        # Sound stop
         if snd.get_num_channels() > 1:
             snd.stop()
 
     def shoot(self):
         now = pg.time.get_ticks()
         if now - self.last_shot > WEAPONS[self.weapon]['rate']:
-            if read_file("save", self.weapon+"_ammo") > 0:
-            #if now - self.last_shot > WEAPONS[self.weapon]['rate']:
-                write_file("save", self.weapon+"_ammo", read_file("save", self.weapon+"_ammo") - 1)
+            if read_file("save", self.weapon + "_ammo") > 0:
+                # if now - self.last_shot > WEAPONS[self.weapon]['rate']:
+                write_file("save", self.weapon + "_ammo", read_file("save", self.weapon + "_ammo") - 1)
                 self.game.info_update()
                 self.last_shot = now
                 dir = vec(1, 0).rotate(-self.rot)
@@ -133,7 +127,6 @@ class Player(pg.sprite.Sprite):
                         snd.stop()
                     snd.play()
                 MuzzleFlash(self.game, pos)
-
 
     def hit(self):
         self.damaged = True
@@ -162,7 +155,8 @@ class Player(pg.sprite.Sprite):
         self.health += amount
         if self.health > self.max_health:
             self.health = self.max_health
-        write_file("save","hp", self.health)
+        write_file("save", "hp", self.health)
+
 
 class Mob(pg.sprite.Sprite):
     def __init__(self, game, x, y, type):
@@ -171,7 +165,7 @@ class Mob(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.mob_img[type].copy()
-        #EDIT-----------------------------------
+        # EDIT-----------------------------------
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.type = type
@@ -187,7 +181,6 @@ class Mob(pg.sprite.Sprite):
         self.speed = choice(MOBS[self.type]["mob_speed"])
         self.target = game.player
 
-
     def avoid_mobs(self):
         for mob in self.game.mobs:
             if mob != self:
@@ -197,7 +190,7 @@ class Mob(pg.sprite.Sprite):
 
     def update(self):
         target_dist = self.target.pos - self.pos
-        if target_dist.length_squared() < MOBS[self.type]["detect_radius"]**2:
+        if target_dist.length_squared() < MOBS[self.type]["detect_radius"] ** 2:
 
             if random() < 0.008:
                 choice(self.game.zombie_moan_sounds).play()
@@ -217,12 +210,12 @@ class Mob(pg.sprite.Sprite):
             collide_with_walls(self, self.game.walls, 'y')
             self.rect.center = self.hit_rect.center
 
- #           if self.pos.x >= WIDTH:
-#                print(self.pos.x-WIDTH)
+        #           if self.pos.x >= WIDTH:
+        #                print(self.pos.x-WIDTH)
 
-#            print(self.pos.x)
+        #            print(self.pos.x)
 
-           #pg.draw
+        # pg.draw
         if self.health <= 0:
             choice(self.game.zombie_hit_sounds).play()
             self.kill()
@@ -230,7 +223,6 @@ class Mob(pg.sprite.Sprite):
             write_file("save", "coins", read_file("save", "coins") + MOBS[self.type]["coin_reward"])
             self.game.info_update()
             self.game.get_xp(MOBS[self.type]["xp_reward"])
-
 
     def draw_health(self):
         pct = MOBS[self.type]["mob_health"]
@@ -245,19 +237,20 @@ class Mob(pg.sprite.Sprite):
         if self.health < MOBS[self.type]["mob_health"]:
             pg.draw.rect(self.image, col, self.health_bar)
 
-class NPC(pg.sprite.Sprite):
+
+class Npc(pg.sprite.Sprite):
     def __init__(self, game, x, y, type):
         self._layer = NPC_LAYER
         self.groups = game.all_sprites, game.npcs
         pg.sprite.Sprite.__init__(self, self.groups)
         self.game = game
         self.image = game.npc_img[type].copy()
-        #EDIT-----------------------------------
+        # EDIT-----------------------------------
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.type = type
         self.name = type
-        self.hit_rect = NPCS[self.type]["npc_hit_rect"].copy()
+        self.hit_rect = NPCS[self.type]["npc_hit_rect"]#.copy()
         self.hit_rect.center = self.rect.center
         self.pos = vec(x, y)
         self.vel = vec(0, 0)
@@ -268,6 +261,8 @@ class NPC(pg.sprite.Sprite):
         self.speed = choice(NPCS[self.type]["npc_speed"])
         self.target = game.player
 
+    def path(self):
+        pass
 
     def avoid_npcs(self):
         for npc in self.game.npcs:
@@ -278,10 +273,9 @@ class NPC(pg.sprite.Sprite):
 
     def update(self):
         target_dist = self.target.pos - self.pos
-        if target_dist.length_squared() < NPCS[self.type]["detect_radius"]**2:
-
-#            if random() < 0.008:
-#                choice(self.game.zombie_moan_sounds).play()
+        if target_dist.length_squared() < NPCS[self.type]["detect_radius"] ** 2:
+            #            if random() < 0.008:
+            #                choice(self.game.zombie_moan_sounds).play()
             self.rot = target_dist.angle_to(vec(1, 0))
             self.image = pg.transform.rotate(self.game.npc_img[self.type], self.rot)
 
@@ -298,12 +292,12 @@ class NPC(pg.sprite.Sprite):
             collide_with_walls(self, self.game.walls, 'y')
             self.rect.center = self.hit_rect.center
 
- #           if self.pos.x >= WIDTH:
-#                print(self.pos.x-WIDTH)
+        #           if self.pos.x >= WIDTH:
+        #                print(self.pos.x-WIDTH)
 
-#            print(self.pos.x)
+        #            print(self.pos.x)
 
-           #pg.draw
+        # pg.draw
         if self.health <= 0:
             choice(self.game.zombie_hit_sounds).play()
             self.kill()
@@ -311,7 +305,6 @@ class NPC(pg.sprite.Sprite):
             write_file("save", "coins", read_file("save", "coins") + NPCS[self.type]["coin_reward"])
             self.game.info_update()
             self.game.get_xp(NPCS[self.type]["xp_reward"])
-
 
     def draw_health(self):
         pct = NPCS[self.type]["npc_health"]
@@ -326,6 +319,7 @@ class NPC(pg.sprite.Sprite):
         if self.health < NPCS[self.type]["npc_health"]:
             pg.draw.rect(self.image, col, self.health_bar)
 
+
 class Bullet(pg.sprite.Sprite):
     def __init__(self, game, pos, dir, damage):
         self._layer = BULLET_LAYER
@@ -338,7 +332,7 @@ class Bullet(pg.sprite.Sprite):
         self.hit_rect = self.rect
         self.pos = vec(pos)
         self.rect.center = pos
-        #spread = uniform(-GUN_SPREAD, GUN_SPREAD)
+        # spread = uniform(-GUN_SPREAD, GUN_SPREAD)
         self.vel = dir * WEAPONS[game.player.weapon]['bullet_speed'] * uniform(0.9, 1.1)
         self.spawn_time = pg.time.get_ticks()
         self.damage = damage
@@ -350,6 +344,7 @@ class Bullet(pg.sprite.Sprite):
             self.kill()
         if pg.time.get_ticks() - self.spawn_time > WEAPONS[self.game.player.weapon]['bullet_lifetime']:
             self.kill()
+
 
 class Obstacle(pg.sprite.Sprite):
     def __init__(self, game, x, y, w, h):
@@ -363,6 +358,7 @@ class Obstacle(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x
         self.rect.y = y
+
 
 class MuzzleFlash(pg.sprite.Sprite):
     def __init__(self, game, pos):
@@ -382,6 +378,7 @@ class MuzzleFlash(pg.sprite.Sprite):
     def update(self):
         if pg.time.get_ticks() - self.spawn_time > FLASH_DURATION:
             self.kill()
+
 
 class Item(pg.sprite.Sprite):
     def __init__(self, game, pos, type):
