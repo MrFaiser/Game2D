@@ -2288,8 +2288,7 @@
  </objectgroup>
  <objectgroup id="16" name="npc obj">
   <object id="1070" name="npc" x="1488" y="1040" width="32" height="32"/>
-  <object id="1071" name="npc" x="2512" y="1744" width="32" height="32"/>
-  <object id="1072" name="npc" x="3152" y="16" width="32" height="32"/>
+  <object id="1071" name="npc_gun" x="2512" y="1744" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="13" name="gun obj"/>
 </map>

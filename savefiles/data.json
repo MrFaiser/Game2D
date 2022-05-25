@@ -3,7 +3,7 @@
         {
             "name": "user",
             "current_level": 4,
-            "coins": 236,
+            "coins": 238,
             "xp": 0,
             "xp_points": 2.780000000000001,
             "sprint_speed": 4,
@@ -21,7 +21,7 @@
             "UPGRADE_LEVEL_auto_reg_up_time": 3,
             "UPGRADE_LEVEL_auto_reg_amount": 4,
             "UPGRADE_LEVEL_show_player_hp": 1,
-            "pistol_ammo": 1022069,
+            "pistol_ammo": 1022076,
             "shotgun_ammo": 12312312290,
             "sniper_ammo": 123213207,
             "rifle_ammo": 1123123161,

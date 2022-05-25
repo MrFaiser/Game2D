@@ -1,3 +1,4 @@
+import itertools
 import json
 import math
 import time
@@ -10,11 +11,14 @@ import sys
 from random import choice, random
 from os import path
 
+from pygame import surface
+
 import settings
 import sprites
 from file_manager import *
 from settings import *
 from sprites import *
+from npc_settings import *
 from savefiles import *
 from tilemap import *
 # HUD functions
@@ -105,6 +109,7 @@ class Game:
         pg.mixer.pre_init(44100, -16, 4, 2048)
         pg.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        #screen = pygame.display.set_mode(SIZE, pygame.RESIZABLE)
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         self.load_data()
@@ -147,6 +152,10 @@ class Game:
         self.hud_font = path.join(img_folder, 'MinecraftRegular-Bmg3.otf')
         self.dim_screen = pg.Surface(self.screen.get_size()).convert_alpha()
         self.dim_screen.fill((0, 0, 0, 200))
+        self.chat_background = pg.image.load(path.join(img_folder, 'chat_background.png')).convert_alpha()
+        self.chat_background_s = pg.transform.scale(self.chat_background, (WIDTH-20, 150))
+        self.chat_box = pg.image.load(path.join(img_folder, 'chat_box.png')).convert_alpha()
+        self.chat_box_s = pg.transform.scale(self.chat_box, (WIDTH, 150))
         self.player_img = pg.image.load(path.join(img_folder, PLAYER_IMG)).convert_alpha()
         self.bullet_images = {}
         self.bullet_images['lg'] = pg.image.load(path.join(img_folder, BULLET_IMG)).convert_alpha()
@@ -251,16 +260,23 @@ class Game:
         for tile_object in self.map.tmxdata.objects:
             obj_center = vec(tile_object.x + tile_object.width / 2,
                              tile_object.y + tile_object.height / 2)
+            #Crate Player
             if tile_object.name == 'player':
                 self.player = Player(self, obj_center.x, obj_center.y)
+            #Create Npc
             if tile_object.name == 'npc':
                 self.npc = Npc(self, obj_center.x, obj_center.y, "npc")
+            if tile_object.name == 'npc_gun':
+                self.npc = Npc(self, obj_center.x, obj_center.y, "npc_gun")
+            #Create Mob
             if tile_object.name == 'zombie':
                 self.mob = Mob(self, obj_center.x, obj_center.y, "zombie")
             if tile_object.name == 'zombie_strong':
                 self.mob = Mob(self, obj_center.x, obj_center.y, "zombie_strong")
+            #Create wall
             if tile_object.name == 'wall':
                 Obstacle(self, tile_object.x, tile_object.y, tile_object.width, tile_object.height)
+            #Create Item
             if tile_object.name in LVL_LIST:
                 t = tile_object.name
                 tt = t.replace("doorlvl", "")
@@ -450,15 +466,6 @@ class Game:
                 self.info_update()
 
             self.buy_upgrade(hit)
-
-
-
-        #  player hit npc
-
-        #hit2 = pg.sprite.spritecollide(self.player, self.npcs, False, collide_hit_rect)
-        #         hit4 = pg.sprite.groupcollide(self.players, self.npcs, False, False)
-        #     #    print("2",hit2)
-        #      #   print("4",hit4)
 
         # mobs hit player
         hits = pg.sprite.spritecollide(self.player, self.mobs, False, collide_hit_rect)
@@ -825,7 +832,6 @@ class Game:
         xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
         self.xp_points = self.xp_points + xp
         for i in range(int(self.truncate((self.xp_points) / xp_needed))):
-            print(i)
             self.xp_lvl = self.xp_lvl + 1
             self.xp_points = self.xp_points % xp_needed
             xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
@@ -858,26 +864,77 @@ class Game:
                 except:
                     pass
 
-    def nearest_npc(self):
+    def dialogue(self, npcType, color):
+        self.npc_chat = []
+        for chat in NPCS_CHAT[npcType]:
+            self.npc_chat.append(chat)
 
+        textGroup = choice(self.npc_chat)
+        text = NPCS_CHAT[npcType][textGroup]
+
+        #Nametag
+        blackBarRectPos = (40, HEIGHT - 200)
+        blackBarRectSize = (300, 50)
+        pygame.draw.rect(self.screen, GREY, pygame.Rect(blackBarRectPos, blackBarRectSize))
+        self.draw_text(npcType, self.hud_font, 40, PINK, 55, HEIGHT-200, align="nw")
+
+        #Background
+        blackBarRectPos = (20, HEIGHT - 150)
+        blackBarRectSize = (WIDTH - 40, 120)
+        pygame.draw.rect(self.screen, DARK_GREY,pygame.Rect(blackBarRectPos, blackBarRectSize))
+
+
+        def blit_text(surface, text, pos, font, color=color):
+            words = [word.split(' ') for word in text.splitlines()]
+            space = font.size(' ')[0]
+            max_width, max_height = surface.get_size()
+            x, y = pos
+            for line in words:
+                for word in line:
+                    word_surface = font.render(word, 0, color)
+                    word_width, word_height = word_surface.get_size()
+                    if x + word_width >= max_width:
+                        x = pos[0]
+                        y += word_height
+                    surface.blit(word_surface, (x, y))
+                    x += word_width + space
+                x = pos[0]
+                y += word_height
+
+        font = pygame.font.Font(self.hud_font, 30)
+
+        continues = True
+        while continues:
+            self.clock.tick(FPS)
+            pygame.event.pump()
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_e:
+                        continues = False
+            pygame.display.flip()
+            blit_text(self.screen, text, (40, HEIGHT-140), font)
+
+    def nearest_npc(self):
         dist_all = []
+        dist_all_type = {}
         for sprite in self.all_sprites:
             if sprite.type == "npc" or sprite.type == "npc_gun":
                 dist = self.player.pos - sprite.pos
                 dist_all.append(dist.length())
+                dist_all_type[dist.length()] = sprite.type
+
         try:
             nearest_npc = dist_all[0]
             for v in dist_all:
                 if v < nearest_npc:
                     nearest_npc = v
-            if nearest_npc <= 100:
-                print("chat")
-
+            if nearest_npc <= NPC_INTERACT_RANGE:
+                print("start dialoge")
+                return dist_all_type[nearest_npc]
         except:
             pass
 
     def events(self):
-        # catch all events here
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 self.quit()
@@ -892,9 +949,12 @@ class Game:
                     self.show_go_screen()
                 if event.key == pg.K_e:
                     print("interact")
-                    self.nearest_npc()
-
-
+                    try:
+                        self.dialogue(self.nearest_npc(), CYAN)
+                    except:
+                        print("Kein NPC in der Nähe!")
+                if event.key == pg.K_c:
+                    pass
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:

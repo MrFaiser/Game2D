@@ -20,8 +20,14 @@ CYAN = (0, 255, 255)
 PINK = (255,105,180)
 
 # game settings
-WIDTH = 1000   # 16 * 64 or 32 * 32 or 64 * 16
+#True False
+full = True
+WIDTH = 1000  # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
+if full:
+    WIDTH = 1920  # 16 * 64 or 32 * 32 or 64 * 16
+    HEIGHT = 1080  # 16 * 48 or 32 * 24 or 64 * 12
+
 FPS = 60
 TITLE = "Titelfenster lol"
 BGCOLOR = BROWN
@@ -110,6 +116,7 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
                   "xp_reward":23.8,
                   "coin_reward": 2}
 
+NPC_INTERACT_RANGE = 100
 NPCS = {}
 NPCS["npc"] = {"npc_img": "npc.png",
                   "npc_speed": [0],
@@ -122,7 +129,7 @@ NPCS["npc"] = {"npc_img": "npc.png",
                   "xp_reward":10,
                   "coin_reward":1}
 NPCS["npc_gun"] = {"npc_img": "npc_gun.png",
-                  "npc_speed": [200, 10],
+                  "npc_speed": [0],
                   "npc_hit_rect": pg.Rect(0, 0, 30, 30),
                   "npc_health": 400,
                   "npc_damage": 20,
