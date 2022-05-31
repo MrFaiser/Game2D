@@ -1,0 +1,28 @@
+{
+    "welcome": [
+        {
+            "activ": false,
+            "completed": false,
+            "text": "text",
+            "description": "sprech mit dem quest boy",
+            "require": 0,
+            "currency": "coins",
+            "reward_xp": 0,
+            "reward_coin": 0, 
+            "reward_text": "viel erfolg noch. brooo" 
+        }
+    ],    
+	"100Coins": [
+        {
+            "activ": false,
+            "completed": false,
+            "text": "text",
+            "description": "geb mir 100 coins",
+            "require": 100,
+            "currency": "coins",
+            "reward_xp": 100,
+            "reward_coin": 50, 
+            "reward_text": "hier noch mal 50Coins kek" 
+        }
+    ]
+}

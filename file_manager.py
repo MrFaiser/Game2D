@@ -35,7 +35,11 @@ data = {
             "rifle_ammo": -1,
             "laser_ammo": 1234567890,
             "compas_lvl": 1,
-            "compas_all": False
+            "compas_all": False,
+
+            #NPC
+            "npc": 0,
+            "npc_gun": 0
 
         }
     ]
@@ -43,9 +47,9 @@ data = {
 
 
 def create_file():
-    if(os.stat("savefiles/data.json").st_size == 0):
+    if(os.stat("files/data.json").st_size == 0):
         print("c")
-        with open('savefiles/data.json', 'w') as File:
+        with open('files/data.json', 'w') as File:
             File.write(json.dumps(data, indent = 4))
             print(data)
             print("Create File!")
@@ -55,7 +59,7 @@ def create_file():
 
 def read_file(region, key):
     print("r", key)
-    with open('savefiles/data.json', 'r') as File:
+    with open('files/data.json', 'r') as File:
         daten = json.load(File)
         for i in daten[region]:
             result = i[key]
@@ -63,11 +67,80 @@ def read_file(region, key):
 
 def write_file(region, key, wert):
     print("w", key, wert)
-    with open("savefiles/data.json", "r") as File:
+    with open("files/data.json", "r") as File:
         data = json.load(File)
 
     for k in data[region]:
         k[key] = wert
 
-    with open("savefiles/data.json", "w") as File:
+    with open("files/data.json", "w") as File:
         File.write(json.dumps(data, indent=4))
+
+
+def read_quest_file(region, key):
+    print("r", key)
+    with open('files/quest_settings.json', 'r') as File:
+        daten = json.load(File)
+        for i in daten[region]:
+            result = i[key]
+        return result
+
+
+def get_all_quests():
+    print("r", "all")
+    with open('files/quest_settings.json', 'r') as File:
+        daten = json.load(File)
+        quests = []
+        for i in daten:
+            quests.append(i)
+        return quests
+
+def get_completed_quests():
+    print("r", "complete")
+    with open('files/quest_settings.json', 'r') as File:
+        daten = json.load(File)
+        quests = []
+        for i in daten:
+            if read_quest_file(i, "completed"):
+                quests.append(i)
+        return quests
+
+def get_open_quests():
+    print("r", "open")
+    with open('files/quest_settings.json', 'r') as File:
+        daten = json.load(File)
+        quests = []
+        for i in daten:
+            if read_quest_file(i, "completed") == False:
+                quests.append(i)
+        return quests
+
+
+file = {
+    "welcome": [
+        {
+            "activ": False,
+            "completed": False,
+            "text": "text",
+            "description": "sprech mit dem quest boy",
+            "require": 0,
+            "currency": "coins",
+            "reward_xp": 0,
+            "reward_coin": 0,
+            "reward_text": "viel erfolg noch. brooo"
+        }
+    ],
+	"100Coins": [
+        {
+            "activ": False,
+            "completed": False,
+            "text": "text",
+            "description": "geb mir 100 coins",
+            "require": 100,
+            "currency": "coins",
+            "reward_xp": 100,
+            "reward_coin": 50,
+            "reward_text": "hier noch mal 50Coins kek"
+        }
+    ]
+}

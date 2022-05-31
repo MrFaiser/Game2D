@@ -13,15 +13,17 @@ RED = (255, 0, 0)
 LIGHT_RED = (255, 100, 100)
 YELLOW = (255, 255, 0)
 BLUE = (0, 0, 255)
-LiGHT_BLUE = (80, 80, 255)
+LIGHT_BLUE = (80, 80, 255)
 BROWN = (106, 55, 5)
 ORANGE = (255, 136, 0)
 CYAN = (0, 255, 255)
-PINK = (255,105,180)
+PINK = (255, 105, 180)
+PURPLE = (50, 0, 50)
+LIGHT_PURPLE = (200, 0, 200)
 
 # game settings
 #True False
-full = True
+full = False
 WIDTH = 1000  # 16 * 64 or 32 * 32 or 64 * 16
 HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
 if full:

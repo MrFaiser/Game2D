@@ -4,6 +4,7 @@ import math
 import time
 from pathlib import Path
 from datetime import datetime
+import yaml
 
 import pygame
 import pygame as pg
@@ -11,15 +12,17 @@ import sys
 from random import choice, random
 from os import path
 
+import yaml
 from pygame import surface
 
+import npc_settings
 import settings
 import sprites
 from file_manager import *
 from settings import *
 from sprites import *
 from npc_settings import *
-from savefiles import *
+from files import *
 from tilemap import *
 # HUD functions
 try:
@@ -77,7 +80,7 @@ def draw_player_stamina(surf, x, y, pct, down):
     elif pct < 0.2 :
         col = RED
     else:
-        col = LiGHT_BLUE
+        col = LIGHT_BLUE
     if down:
         col = GREY
     pg.draw.rect(surf, LIGHT_GREY, back_rect)
@@ -145,7 +148,7 @@ class Game:
         img_folder = path.join(game_folder, 'img')
         snd_folder = path.join(game_folder, 'snd')
         music_folder = path.join(game_folder, 'music')
-        save_folder = path.join(game_folder, 'savefiles')
+        save_folder = path.join(game_folder, 'files')
         self.safe_file = path.join(save_folder, "save.txt")
         self.map_folder = path.join(game_folder, 'maps')
         self.title_font = path.join(img_folder, 'MinecraftBold-nMK1.otf')
@@ -292,6 +295,7 @@ class Game:
         self.draw_debug = False
         self.paused = False
         self.shop = False
+        self.quest_book = False
         self.night = False
         self.lvl_fin = False
         self.compas_is_used = False
@@ -596,6 +600,112 @@ class Game:
             pg.display.update()
 
 
+    def create_quest_frame(self):
+        sizeX = 200
+        sizeY = 50
+
+        #acceptX = 100
+        acceptX = WIDTH/2-100-sizeX-100
+        acceptY = 550
+
+        deniedX = WIDTH/2+100
+        deniedY = 550
+
+
+        shopY = 50
+
+
+
+        ###
+        def blit_text(surface, text, pos, font, color=CYAN):
+            words = [word.split(' ') for word in text.splitlines()]
+            space = font.size(' ')[0]
+            max_width, max_height = surface.get_size()
+            x, y = pos
+            for line in words:
+                for word in line:
+                    word_surface = font.render(word, 0, color)
+                    word_width, word_height = word_surface.get_size()
+                    if x + word_width >= max_width:
+                        x = pos[0]
+                        y += word_height
+                    surface.blit(word_surface, (x, y))
+                    x += word_width + space
+                x = pos[0]
+                y += word_height
+        ###
+
+        trennlinie = "--------------------------------------------------------------------------" \
+                     "--------------------------------------------------------------------------"
+
+        self.screen.blit(self.dim_screen, (0, 0))
+
+        allCurrentQuest = []
+        currentQuestsName = []
+        currentQuestsReward = []
+        currentQuestsRewardCurrency = []
+        currentQuestsDescription = []
+
+        with open('files/quest_settings.json', 'r') as f:
+            allCurrentQuest = json.load(f)
+
+        for Q in allCurrentQuest:
+            currentQuestsName.append(Q)
+            for R in allCurrentQuest[Q]:
+                currentQuestsReward.append(R["reward_coin"])
+            for C in allCurrentQuest[Q]:
+                currentQuestsRewardCurrency.append(C["currency"])
+            for D in allCurrentQuest[Q]:
+                currentQuestsDescription.append(D["description"])
+
+
+#        for C in allCurrentQuest[Q]["currency"]:
+#            currentQuestsRewardCurrency.append(C)
+
+        print("A", allCurrentQuest)
+        print("Q", currentQuestsName)
+        print("R", currentQuestsReward)
+        print("C", currentQuestsRewardCurrency)
+        print("D", currentQuestsDescription)
+
+        while True:
+            self.paused = True
+
+
+            self.draw_text("QUEST", self.title_font, 105, LIGHT_PURPLE, WIDTH / 2, shopY, align="center")
+            self.draw_text(trennlinie, self.title_font, 10, LIGHT_GREY, WIDTH / 2, shopY+50, align="center")
+
+            #write text
+            self.draw_text("Du hast Folgende Quest's offen!", self.hud_font, 40, LIGHT_GREY, WIDTH/2, shopY + 100, align="center")
+            self.draw_text("Name", self.hud_font, 30, WHITE, WIDTH / 10, shopY + 170, align="nw")
+            self.draw_text("Belohnung", self.hud_font, 30, WHITE, WIDTH/2 - WIDTH/8, shopY + 170, align="n")
+            self.draw_text("Beschreibung", self.hud_font, 30, WHITE, WIDTH/2, shopY + 170, align="nw")
+
+            cN = 1
+            for i in currentQuestsName:
+                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH/10, shopY + 150 + (50 * cN), align="nw")
+                cN = cN + 1
+            cR = 1
+            for i in currentQuestsReward:
+                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH/8, shopY + 150 + (50 * cR), align= "ne")
+                cR = cR + 1
+            cC = 1
+            for i in currentQuestsRewardCurrency:
+                self.draw_text(" {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH/8, shopY + 150 + (50 * cC), align= "nw")
+                cC = cC + 1
+            cD = 1
+            for i in currentQuestsDescription:
+                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2, shopY + 150 + (50 * cD), align= "nw")
+                cD = cD + 1
+
+
+
+            #write values
+
+            #write answer
+            pg.display.update()
+
+
     def buy_upgrade(self, item):
         if self.buy_cooldown == False:
             if item.type == "max_health_up":
@@ -822,12 +932,10 @@ class Game:
 
         pg.display.flip()
 
-############################################################
     def truncate(self, n, decimals=0):
         multiplier = 10 ** decimals
         return int(n * multiplier) / multiplier
 
-##################################
     def get_xp(self, xp):
         xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
         self.xp_points = self.xp_points + xp
@@ -838,7 +946,6 @@ class Game:
 
             write_file("save", "xp", self.xp_lvl)
             write_file("save", "xp_points", self.xp_points)
-
 
     def use_compas(self):
         dist_all = []
@@ -864,13 +971,41 @@ class Game:
                 except:
                     pass
 
-    def dialogue(self, npcType, color):
-        self.npc_chat = []
-        for chat in NPCS_CHAT[npcType]:
-            self.npc_chat.append(chat)
+    def find_quest(self):
+        with open("files/quest_settings.json", 'r') as stream:
+            try:
+                print(yaml.safe_load(stream))
+            except yaml.YAMLError as exc:
+                print(exc)
 
-        textGroup = choice(self.npc_chat)
-        text = NPCS_CHAT[npcType][textGroup]
+    def dialogue(self, npcType, textMode):
+        if npcType == "alert":
+            text = textMode
+        else:
+
+            npcRandomChat = []
+
+            storyLVL = read_file("save", npcType)
+
+            if storyLVL == 0:
+
+                write_file("save", npcType, 1)
+                text = globals()[npcType]["welcome"]["welcome"]
+            else:
+                if textMode == "story":
+                    textGroup = textMode + str(storyLVL)
+                    try:
+                        text = globals()[npcType][textMode][textGroup]
+                        write_file("save", npcType, storyLVL+1)
+                    except:
+                        self.dialogue(str(npcType), "random")
+                else:
+                    for randomChat in globals()[npcType]["random"]:
+                        npcRandomChat.append(randomChat)
+                    text = choice(npcRandomChat)
+                    print(npcRandomChat)
+                    print(text)
+
 
         #Nametag
         blackBarRectPos = (40, HEIGHT - 200)
@@ -884,7 +1019,7 @@ class Game:
         pygame.draw.rect(self.screen, DARK_GREY,pygame.Rect(blackBarRectPos, blackBarRectSize))
 
 
-        def blit_text(surface, text, pos, font, color=color):
+        def blit_text(surface, text, pos, font, color=CYAN):
             words = [word.split(' ') for word in text.splitlines()]
             space = font.size(' ')[0]
             max_width, max_height = surface.get_size()
@@ -929,7 +1064,6 @@ class Game:
                 if v < nearest_npc:
                     nearest_npc = v
             if nearest_npc <= NPC_INTERACT_RANGE:
-                print("start dialoge")
                 return dist_all_type[nearest_npc]
         except:
             pass
@@ -948,13 +1082,14 @@ class Game:
                 if event.key == pg.K_o:
                     self.show_go_screen()
                 if event.key == pg.K_e:
-                    print("interact")
                     try:
-                        self.dialogue(self.nearest_npc(), CYAN)
+                        self.dialogue(self.nearest_npc(), "story")
                     except:
                         print("Kein NPC in der Nähe!")
                 if event.key == pg.K_c:
-                    pass
+                    self.create_quest_frame()
+
+                    #self.dialogue("alert", "Es ist was passiert!")
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:
@@ -993,13 +1128,16 @@ class Game:
                         self.ammo = read_file("save", self.player.weapon+"_ammo")
                     pass
                 if event.key == pg.K_6:
+                    print(6)
                     self.compas_is_used = not self.compas_is_used
                 if event.key == pg.K_7:
+                    print(7)
                     pass
                 if event.key == pg.K_8:
                     print(8)
                     pass
                 if event.key == pg.K_9:
+                    print(9)
                     pass
 
     def show_start_screen(self):

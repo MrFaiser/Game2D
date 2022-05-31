@@ -21,13 +21,15 @@
             "UPGRADE_LEVEL_auto_reg_up_time": 3,
             "UPGRADE_LEVEL_auto_reg_amount": 4,
             "UPGRADE_LEVEL_show_player_hp": 1,
-            "pistol_ammo": 1022076,
+            "pistol_ammo": 1022075,
             "shotgun_ammo": 12312312290,
             "sniper_ammo": 123213207,
             "rifle_ammo": 1123123161,
             "laser_ammo": 1234567376,
             "compas_lvl": 3,
-            "compas_all": false
+            "compas_all": false,
+            "npc": 4,
+            "npc_gun": 1
         }
     ]
 }
