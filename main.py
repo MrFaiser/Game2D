@@ -18,6 +18,7 @@ from pygame import surface
 import npc_settings
 import settings
 import sprites
+import start_screen
 from file_manager import *
 from settings import *
 from sprites import *
@@ -316,7 +317,7 @@ class Game:
             self.dt = self.clock.tick(FPS) / 1000.0  # fix for Python 2.x
             self.events()
             if not self.paused:
-                if not self.shop:
+                if not self.shop or not self.quest_book:
                     self.update()
 
                     #Start loop Item Respawn
@@ -599,13 +600,12 @@ class Game:
             self.draw_text("Ablehnen", self.hud_font, 40, RED, deniedX + 10, deniedY, align="nw")
             pg.display.update()
 
-
     def create_quest_frame(self):
-        sizeX = 200
-        sizeY = 50
+        sizeX = WIDTH-80
+        sizeY = 35
 
-        #acceptX = 100
-        acceptX = WIDTH/2-100-sizeX-100
+        #40, shopY + 150 + (50 * qN)
+        acceptX = 40
         acceptY = 550
 
         deniedX = WIDTH/2+100
@@ -614,40 +614,20 @@ class Game:
 
         shopY = 50
 
-
-
-        ###
-        def blit_text(surface, text, pos, font, color=CYAN):
-            words = [word.split(' ') for word in text.splitlines()]
-            space = font.size(' ')[0]
-            max_width, max_height = surface.get_size()
-            x, y = pos
-            for line in words:
-                for word in line:
-                    word_surface = font.render(word, 0, color)
-                    word_width, word_height = word_surface.get_size()
-                    if x + word_width >= max_width:
-                        x = pos[0]
-                        y += word_height
-                    surface.blit(word_surface, (x, y))
-                    x += word_width + space
-                x = pos[0]
-                y += word_height
-        ###
-
         trennlinie = "--------------------------------------------------------------------------" \
                      "--------------------------------------------------------------------------"
 
+
         self.screen.blit(self.dim_screen, (0, 0))
 
-        allCurrentQuest = []
+        allCurrentQuest = get_Quest_file()
         currentQuestsName = []
         currentQuestsReward = []
         currentQuestsRewardCurrency = []
         currentQuestsDescription = []
+        activQuests = []
 
-        with open('files/quest_settings.json', 'r') as f:
-            allCurrentQuest = json.load(f)
+
 
         for Q in allCurrentQuest:
             currentQuestsName.append(Q)
@@ -657,46 +637,74 @@ class Game:
                 currentQuestsRewardCurrency.append(C["currency"])
             for D in allCurrentQuest[Q]:
                 currentQuestsDescription.append(D["description"])
+            for A in allCurrentQuest[Q]:
+                if is_avtiv(Q):
+                    activQuests.append(Q)
 
 
-#        for C in allCurrentQuest[Q]["currency"]:
-#            currentQuestsRewardCurrency.append(C)
+       # Print Text
+        self.draw_text("QUEST", self.title_font, 105, LIGHT_PURPLE, WIDTH / 2, shopY, align="center")
+        self.draw_text(trennlinie, self.title_font, 10, LIGHT_GREY, WIDTH / 2, shopY + 50, align="center")
 
-        print("A", allCurrentQuest)
-        print("Q", currentQuestsName)
-        print("R", currentQuestsReward)
-        print("C", currentQuestsRewardCurrency)
-        print("D", currentQuestsDescription)
+        # write text
+        self.draw_text("Du hast Folgende Quest's offen!", self.hud_font, 40, LIGHT_GREY, WIDTH / 2, shopY + 100,align="center")
+        # self.draw_text("Aktiv", self.hud_font, 30, WHITE, WIDTH / 10-10, shopY + 170, align="ne")
+        self.draw_text("Name", self.hud_font, 30, CYAN, WIDTH / 10, shopY + 155, align="nw")
+        self.draw_text("Belohnung", self.hud_font, 30, CYAN, WIDTH / 2 - WIDTH / 8, shopY + 155, align="n")
+        self.draw_text("Beschreibung", self.hud_font, 30, CYAN, WIDTH / 2, shopY + 155, align="nw")
 
-        while True:
-            self.paused = True
+        # LOOP
+        self.quest_book = not self.quest_book
 
+        while self.quest_book:
+            self.clock.tick(FPS)
+            pygame.event.pump()
+            mouse = pygame.mouse.get_pos()
+            for event in pg.event.get():
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_c:
+                        self.quest_book = not self.quest_book
 
-            self.draw_text("QUEST", self.title_font, 105, LIGHT_PURPLE, WIDTH / 2, shopY, align="center")
-            self.draw_text(trennlinie, self.title_font, 10, LIGHT_GREY, WIDTH / 2, shopY+50, align="center")
-
-            #write text
-            self.draw_text("Du hast Folgende Quest's offen!", self.hud_font, 40, LIGHT_GREY, WIDTH/2, shopY + 100, align="center")
-            self.draw_text("Name", self.hud_font, 30, WHITE, WIDTH / 10, shopY + 170, align="nw")
-            self.draw_text("Belohnung", self.hud_font, 30, WHITE, WIDTH/2 - WIDTH/8, shopY + 170, align="n")
-            self.draw_text("Beschreibung", self.hud_font, 30, WHITE, WIDTH/2, shopY + 170, align="nw")
-
-            cN = 1
+            # Hell und dunkel Graue zeilen
+            qN = 1
             for i in currentQuestsName:
-                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH/10, shopY + 150 + (50 * cN), align="nw")
-                cN = cN + 1
-            cR = 1
+                if qN % 2 == 0:
+                    pygame.draw.rect(self.screen, GREY, [40, shopY + 150 + (50 * qN), sizeX, sizeY])
+                else:
+                    pygame.draw.rect(self.screen, MEDIUM_GREY, [40, shopY + 150 + (50 * qN), sizeX, sizeY])
+
+
+
+                #Hover
+                if 40 <= mouse[0] <= 40 + sizeX and shopY + 150 + (50 * qN) <= mouse[1] <= shopY + 150 + (50 * qN) + sizeY:
+                    pygame.draw.rect(self.screen, LIGHT_BLUE, [40, shopY + 150 + (50 * qN), sizeX, sizeY])
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if not is_avtiv(i):
+                            set_avtiv(i)
+
+                            self.quest_book = False
+                            return
+                # schrift hinzufügen
+                self.draw_text("> {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 10, shopY + 150 + (50 * qN),align="nw")
+
+                if i in activQuests:
+                    self.draw_text("*", self.hud_font, 25, RED, WIDTH / 10-10, shopY + 150 + (50 * qN), align="ne")
+
+                qN = qN + 1
+
+
+            qR = 1
             for i in currentQuestsReward:
-                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH/8, shopY + 150 + (50 * cR), align= "ne")
-                cR = cR + 1
-            cC = 1
+                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH/8, shopY + 150 + (50 * qR), align= "ne")
+                qR = qR + 1
+            qC = 1
             for i in currentQuestsRewardCurrency:
-                self.draw_text(" {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH/8, shopY + 150 + (50 * cC), align= "nw")
-                cC = cC + 1
-            cD = 1
+                self.draw_text(" {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH/8, shopY + 150 + (50 * qC), align= "nw")
+                qC = qC + 1
+            qD = 1
             for i in currentQuestsDescription:
-                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2, shopY + 150 + (50 * cD), align= "nw")
-                cD = cD + 1
+                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2, shopY + 150 + (50 * qD), align= "nw")
+                qD = qD + 1
 
 
 
@@ -704,7 +712,6 @@ class Game:
 
             #write answer
             pg.display.update()
-
 
     def buy_upgrade(self, item):
         if self.buy_cooldown == False:
@@ -1006,17 +1013,18 @@ class Game:
                     print(npcRandomChat)
                     print(text)
 
+        # Background
+        blackBarRectPos = (20, HEIGHT - 150)
+        blackBarRectSize = (WIDTH - 40, 120)
+        pygame.draw.rect(self.screen, DARK_GREY, pygame.Rect(blackBarRectPos, blackBarRectSize))
 
         #Nametag
         blackBarRectPos = (40, HEIGHT - 200)
         blackBarRectSize = (300, 50)
         pygame.draw.rect(self.screen, GREY, pygame.Rect(blackBarRectPos, blackBarRectSize))
         self.draw_text(npcType, self.hud_font, 40, PINK, 55, HEIGHT-200, align="nw")
+        self.draw_text("Press E to continue", self.hud_font, 20, PINK, WIDTH-40, HEIGHT-40, align="se")
 
-        #Background
-        blackBarRectPos = (20, HEIGHT - 150)
-        blackBarRectSize = (WIDTH - 40, 120)
-        pygame.draw.rect(self.screen, DARK_GREY,pygame.Rect(blackBarRectPos, blackBarRectSize))
 
 
         def blit_text(surface, text, pos, font, color=CYAN):
@@ -1088,8 +1096,6 @@ class Game:
                         print("Kein NPC in der Nähe!")
                 if event.key == pg.K_c:
                     self.create_quest_frame()
-
-                    #self.dialogue("alert", "Es ist was passiert!")
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:
@@ -1219,3 +1225,5 @@ while True:
     g.new("home.tmx")
     g.run()
     g.show_go_screen()
+
+

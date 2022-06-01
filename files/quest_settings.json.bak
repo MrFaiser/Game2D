@@ -8,21 +8,47 @@
             "require": 0,
             "currency": "coins",
             "reward_xp": 0,
-            "reward_coin": "0", 
-            "reward_text": "viel erfolg noch. brooo" 
+            "reward_coin": 0,
+            "reward_text": "viel erfolg noch. brooo"
         }
-    ],    
-	"100Coins": [
+    ],
+    "100Coins": [
         {
-            "activ": false,
+            "activ": true,
             "completed": false,
             "text": "text",
             "description": "geb mir 100 coins",
             "require": 100,
             "currency": "coins",
             "reward_xp": 100,
-            "reward_coin": 50, 
-            "reward_text": "hier noch mal 50Coins kek" 
+            "reward_coin": 50,
+            "reward_text": "hier noch mal 50Coins kek"
+        }
+    ],
+    "10XP": [
+        {
+            "activ": false,
+            "completed": false,
+            "text": "text",
+            "description": "geb mir 10 XP",
+            "require": 10,
+            "currency": "XP",
+            "reward_xp": 20,
+            "reward_coin": 150,
+            "reward_text": "als belohnung 150Coins"
+        }
+    ],
+    "20XP": [
+        {
+            "activ": false,
+            "completed": false,
+            "text": "text",
+            "description": "geb mir 20 XP",
+            "require": 20,
+            "currency": "XP",
+            "reward_xp": 120,
+            "reward_coin": 300,
+            "reward_text": "als belohnung 300Coins"
         }
     ]
 }

@@ -1,5 +1,8 @@
 import json
 import os
+
+import pygame
+
 import sprites
 
 data = {
@@ -56,7 +59,6 @@ def create_file():
     else:
         print("File already exists!")
 
-
 def read_file(region, key):
     print("r", key)
     with open('files/data.json', 'r') as File:
@@ -76,17 +78,21 @@ def write_file(region, key, wert):
     with open("files/data.json", "w") as File:
         File.write(json.dumps(data, indent=4))
 
+def get_Quest_file():
+    print("oQ")
+    with open('files/quest_settings.json', 'r') as f:
+        data = json.load(f)
+    return data
 
-def read_quest_file(region, key):
-    print("r", key)
+def read_quest_file(NameDerQuest, key):
+    print("r-Q", key)
     with open('files/quest_settings.json', 'r') as File:
         daten = json.load(File)
-        for i in daten[region]:
+        for i in daten[NameDerQuest]:
             result = i[key]
         return result
 
-
-def get_all_quests():
+def get_all_quest_name():
     print("r", "all")
     with open('files/quest_settings.json', 'r') as File:
         daten = json.load(File)
@@ -114,6 +120,23 @@ def get_open_quests():
             if read_quest_file(i, "completed") == False:
                 quests.append(i)
         return quests
+
+def is_avtiv(NameDerQuest):
+    print("r", "activ")
+    for i in data:
+        if read_quest_file(NameDerQuest, "activ"):
+            return True
+
+def set_avtiv(NameDerQuest):
+    print("wQa")
+    with open("files/quest_settings.json", "r") as File:
+        data = json.load(File)
+
+    for k in data[NameDerQuest]:
+        k["activ"] = True
+
+    with open("files/quest_settings.json", "w") as File:
+        File.write(json.dumps(data, indent=4))
 
 
 file = {

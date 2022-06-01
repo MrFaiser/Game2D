@@ -6,16 +6,21 @@ WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 DARK_GREY = (40, 40, 40)
 GREY = (100, 100, 100)
+MEDIUM_GREY = (130, 130, 120)
 LIGHT_GREY = (180, 180, 180)
 GREEN = (0, 255, 0)
+LIGHT_GREEN = (150, 255, 150)
 DARK_GREEN = (0, 100, 0)
 RED = (255, 0, 0)
+DARK_RED = (100, 0, 0)
 LIGHT_RED = (255, 100, 100)
 YELLOW = (255, 255, 0)
 BLUE = (0, 0, 255)
 LIGHT_BLUE = (80, 80, 255)
 BROWN = (106, 55, 5)
 ORANGE = (255, 136, 0)
+DARK_ORANGE = (155, 86, 0)
+LIGHT_ORANGE = (255, 166, 50)
 CYAN = (0, 255, 255)
 PINK = (255, 105, 180)
 PURPLE = (50, 0, 50)
@@ -254,3 +259,8 @@ WEAPON_SOUNDS = {'pistol': ['pistol.wav'],
 EFFECTS_SOUNDS = {'level_start': 'level_start.wav',
                   'health_up': 'health_pack.wav',
                   "gun_pickup": "gun_pickup.wav"}
+
+# TEXT
+START_TEXT = "START GAME"
+OPTION_TEXT = "OPTION"
+QUIT_TEXT = "LEAVE"
