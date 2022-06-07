@@ -101,6 +101,16 @@ def get_all_quest_name():
             quests.append(i)
         return quests
 
+def get_all_activ_quest():
+    print("r", "complete")
+    with open('files/quest_settings.json', 'r') as File:
+        daten = json.load(File)
+        quests = []
+        for i in daten:
+            if read_quest_file(i, "activ"):
+                quests.append(i)
+        return quests
+
 def get_completed_quests():
     print("r", "complete")
     with open('files/quest_settings.json', 'r') as File:

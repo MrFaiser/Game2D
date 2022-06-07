@@ -616,7 +616,8 @@ class Game:
 
         trennlinie = "--------------------------------------------------------------------------" \
                      "--------------------------------------------------------------------------"
-
+        global MSG
+        MSG = ""
 
         self.screen.blit(self.dim_screen, (0, 0))
 
@@ -653,19 +654,8 @@ class Game:
         self.draw_text("Belohnung", self.hud_font, 30, CYAN, WIDTH / 2 - WIDTH / 8, shopY + 155, align="n")
         self.draw_text("Beschreibung", self.hud_font, 30, CYAN, WIDTH / 2, shopY + 155, align="nw")
 
-        # LOOP
-        self.quest_book = not self.quest_book
-
-        while self.quest_book:
-            self.clock.tick(FPS)
-            pygame.event.pump()
-            mouse = pygame.mouse.get_pos()
-            for event in pg.event.get():
-                if event.type == pg.KEYDOWN:
-                    if event.key == pg.K_c:
-                        self.quest_book = not self.quest_book
-
-            # Hell und dunkel Graue zeilen
+        def displayQuest(Clicked):
+            mouse = pg.mouse.get_pos()
             qN = 1
             for i in currentQuestsName:
                 if qN % 2 == 0:
@@ -673,45 +663,68 @@ class Game:
                 else:
                     pygame.draw.rect(self.screen, MEDIUM_GREY, [40, shopY + 150 + (50 * qN), sizeX, sizeY])
 
-
-
-                #Hover
                 if 40 <= mouse[0] <= 40 + sizeX and shopY + 150 + (50 * qN) <= mouse[1] <= shopY + 150 + (50 * qN) + sizeY:
                     pygame.draw.rect(self.screen, LIGHT_BLUE, [40, shopY + 150 + (50 * qN), sizeX, sizeY])
-                    if event.type == pygame.MOUSEBUTTONDOWN:
+                    if (Clicked):
                         if not is_avtiv(i):
-                            set_avtiv(i)
+                            if len(get_all_activ_quest()) < 3:
+                                set_avtiv(i)
+                                self.quest_book = False
+                                return i
+                            else:
+                                global MSG
+                                MSG = "Du Kannst Maximal nur 3 Quest's anngehmen! Schliese zuerst andere ab!"
+                                self.quest_book = False
+                                return
 
-                            self.quest_book = False
-                            return
                 # schrift hinzufügen
-                self.draw_text("> {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 10, shopY + 150 + (50 * qN),align="nw")
-
+                self.draw_text("> {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 10, shopY + 150 + (50 * qN),
+                               align="nw")
                 if i in activQuests:
-                    self.draw_text("*", self.hud_font, 25, RED, WIDTH / 10-10, shopY + 150 + (50 * qN), align="ne")
-
+                    self.draw_text("*", self.hud_font, 25, RED, WIDTH / 10 - 10, shopY + 150 + (50 * qN), align="ne")
                 qN = qN + 1
 
+                #Click check
 
             qR = 1
             for i in currentQuestsReward:
-                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH/8, shopY + 150 + (50 * qR), align= "ne")
+                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH / 8, shopY + 150 + (50 * qR),
+                               align="ne")
                 qR = qR + 1
             qC = 1
             for i in currentQuestsRewardCurrency:
-                self.draw_text(" {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH/8, shopY + 150 + (50 * qC), align= "nw")
+                self.draw_text(" {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH / 8, shopY + 150 + (50 * qC),
+                               align="nw")
                 qC = qC + 1
             qD = 1
             for i in currentQuestsDescription:
-                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2, shopY + 150 + (50 * qD), align= "nw")
+                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2, shopY + 150 + (50 * qD), align="nw")
                 qD = qD + 1
 
+        # LOOP
+        self.quest_book = not self.quest_book
+        displayQuest(False)
+        while self.quest_book:
+            self.clock.tick(FPS)
+            pygame.event.pump()
 
+            for event in pg.event.get():
+                if event.type == pygame.QUIT:
+                    self.playing = False
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_c or event.key == pg.K_ESCAPE:
+                        self.quest_book = not self.quest_book
+                elif event.type == pygame.MOUSEMOTION:
+                    displayQuest(False)
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    print(displayQuest(True))
 
-            #write values
-
-            #write answer
             pg.display.update()
+
+        if not MSG == "":
+            displayQuest(False)
+            self.dialogue("alert", MSG)
+
 
     def buy_upgrade(self, item):
         if self.buy_cooldown == False:
@@ -1225,5 +1238,6 @@ while True:
     g.new("home.tmx")
     g.run()
     g.show_go_screen()
+
 
 

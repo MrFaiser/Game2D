@@ -1,7 +1,7 @@
 {
     "welcome": [
         {
-            "activ": false,
+            "activ": true,
             "completed": false,
             "text": "text",
             "description": "sprech mit dem quest boy",
@@ -40,7 +40,7 @@
     ],
     "20XP": [
         {
-            "activ": false,
+            "activ": true,
             "completed": false,
             "text": "text",
             "description": "geb mir 20 XP",
