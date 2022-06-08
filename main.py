@@ -1,29 +1,10 @@
-import itertools
-import json
 import math
 import time
 from pathlib import Path
-from datetime import datetime
-import yaml
-
-import pygame
-import pygame as pg
 import sys
-from random import choice, random
 from os import path
-
-import yaml
-from pygame import surface
-
-import npc_settings
-import settings
-import sprites
-import start_screen
-from file_manager import *
-from settings import *
 from sprites import *
 from npc_settings import *
-from files import *
 from tilemap import *
 # HUD functions
 try:
@@ -376,7 +357,7 @@ class Game:
         self.player.auto_reg_up = read_file("save", "auto_reg_time")
         self.player.auto_reg_amount = read_file("save", "auto_reg_amount")
 
-        print("info update", time.time())
+        print("info update:", time.time())
 
     def get_ammo(self):
         write_file("save", self.player.weapon + "_ammo",
@@ -624,23 +605,21 @@ class Game:
         allCurrentQuest = get_Quest_file()
         currentQuestsName = []
         currentQuestsReward = []
-        currentQuestsRewardCurrency = []
         currentQuestsDescription = []
         activQuests = []
 
 
 
         for Q in allCurrentQuest:
-            currentQuestsName.append(Q)
-            for R in allCurrentQuest[Q]:
-                currentQuestsReward.append(R["reward_coin"])
-            for C in allCurrentQuest[Q]:
-                currentQuestsRewardCurrency.append(C["currency"])
-            for D in allCurrentQuest[Q]:
-                currentQuestsDescription.append(D["description"])
-            for A in allCurrentQuest[Q]:
-                if is_avtiv(Q):
-                    activQuests.append(Q)
+            if not Q in get_completed_quests():
+                currentQuestsName.append(Q)
+                for R in allCurrentQuest[Q]:
+                    currentQuestsReward.append(R["reward_coin"])
+                for D in allCurrentQuest[Q]:
+                    currentQuestsDescription.append(D["description"])
+                for A in allCurrentQuest[Q]:
+                    if is_avtiv(Q):
+                        activQuests.append(Q)
 
 
        # Print Text
@@ -651,7 +630,7 @@ class Game:
         self.draw_text("Du hast Folgende Quest's offen!", self.hud_font, 40, LIGHT_GREY, WIDTH / 2, shopY + 100,align="center")
         # self.draw_text("Aktiv", self.hud_font, 30, WHITE, WIDTH / 10-10, shopY + 170, align="ne")
         self.draw_text("Name", self.hud_font, 30, CYAN, WIDTH / 10, shopY + 155, align="nw")
-        self.draw_text("Belohnung", self.hud_font, 30, CYAN, WIDTH / 2 - WIDTH / 8, shopY + 155, align="n")
+        self.draw_text("Belohnungen", self.hud_font, 30, CYAN, WIDTH / 2 - WIDTH / 8, shopY + 155, align="n")
         self.draw_text("Beschreibung", self.hud_font, 30, CYAN, WIDTH / 2, shopY + 155, align="nw")
 
         def displayQuest(Clicked):
@@ -666,13 +645,36 @@ class Game:
                 if 40 <= mouse[0] <= 40 + sizeX and shopY + 150 + (50 * qN) <= mouse[1] <= shopY + 150 + (50 * qN) + sizeY:
                     pygame.draw.rect(self.screen, LIGHT_BLUE, [40, shopY + 150 + (50 * qN), sizeX, sizeY])
                     if (Clicked):
-                        if not is_avtiv(i):
+                        if is_avtiv(i):
+                            self.finish_quest(i)
+                            global MSG
+                            MSG = "Quest Abgeschlossen:", get_quest_attribute(i, "reward_text")
+                            MSG = str(MSG)
+                            MSG = MSG.replace("(", "")
+                            MSG = MSG.replace(")", "")
+                            MSG = MSG.replace("'", "")
+                            MSG = MSG.replace(",", "")
+                            MSG = MSG.replace("# ", '"')
+                            MSG = MSG.replace(" #", '" ')
+
+                            self.quest_book = False
+                            return
+                        else:
                             if len(get_all_activ_quest()) < 3:
                                 set_avtiv(i)
+
+                                MSG = "Du hast die Quest #" , i, "#angenommen! -->", get_quest_attribute(i, "description")
+                                MSG = str(MSG)
+                                MSG = MSG.replace("(","")
+                                MSG = MSG.replace(")","")
+                                MSG = MSG.replace("'","")
+                                MSG = MSG.replace(",","")
+                                MSG = MSG.replace("# ",'"')
+                                MSG = MSG.replace(" #",'" ')
                                 self.quest_book = False
-                                return i
+                                return
                             else:
-                                global MSG
+
                                 MSG = "Du Kannst Maximal nur 3 Quest's anngehmen! Schliese zuerst andere ab!"
                                 self.quest_book = False
                                 return
@@ -688,12 +690,12 @@ class Game:
 
             qR = 1
             for i in currentQuestsReward:
-                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH / 8, shopY + 150 + (50 * qR),
+                self.draw_text("{}".format(i), self.hud_font, 25, ORANGE, WIDTH/2 - WIDTH/8, shopY + 150 + (50 * qR),
                                align="ne")
                 qR = qR + 1
             qC = 1
             for i in currentQuestsRewardCurrency:
-                self.draw_text(" {}".format(i), self.hud_font, 25, ORANGE, WIDTH / 2 - WIDTH / 8, shopY + 150 + (50 * qC),
+                self.draw_text(" {}".format(i), self.hud_font, 25, ORANGE, WIDTH/2 - WIDTH/8, shopY + 150 + (50 * qC),
                                align="nw")
                 qC = qC + 1
             qD = 1
@@ -717,13 +719,36 @@ class Game:
                 elif event.type == pygame.MOUSEMOTION:
                     displayQuest(False)
                 elif event.type == pygame.MOUSEBUTTONDOWN:
-                    print(displayQuest(True))
+                    displayQuest(True)
 
             pg.display.update()
 
         if not MSG == "":
             displayQuest(False)
             self.dialogue("alert", MSG)
+
+    def finish_quest(self, quest):
+        print(quest)
+        currency = get_quest_attribute(quest, "currency")
+        require = get_quest_attribute(quest, "require")
+        if currency == "coins":
+            if self.coins >= require:
+                #take away
+                self.coins = self.coins - require
+
+                #get reward
+                self.add_xp(get_quest_attribute(quest,"reward_xp"))
+                self.add_coin(get_quest_attribute(quest, "reward_coin"))
+
+
+                #update quest
+                set_quest_completed(quest)
+        elif currency == "XP":
+            pass
+        elif currency == "item":
+            pass
+        else:
+            pass
 
 
     def buy_upgrade(self, item):
@@ -956,9 +981,19 @@ class Game:
         multiplier = 10 ** decimals
         return int(n * multiplier) / multiplier
 
-    def get_xp(self, xp):
-        xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
+    def add_coin(self, coins):
+        self.coins = self.coins + coins
+        write_file("save", "coins", self.coins)
+
+    def add_xp(self, xp):
         self.xp_points = self.xp_points + xp
+        print("+",xp)
+        print("----",self.xp_points)
+
+        self.get_xp_lvl()
+
+    def get_xp_lvl(self):
+        xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
         for i in range(int(self.truncate((self.xp_points) / xp_needed))):
             self.xp_lvl = self.xp_lvl + 1
             self.xp_points = self.xp_points % xp_needed
@@ -990,13 +1025,6 @@ class Game:
                                              self.camera.apply(sprite).center, 2)
                 except:
                     pass
-
-    def find_quest(self):
-        with open("files/quest_settings.json", 'r') as stream:
-            try:
-                print(yaml.safe_load(stream))
-            except yaml.YAMLError as exc:
-                print(exc)
 
     def dialogue(self, npcType, textMode):
         if npcType == "alert":
@@ -1102,6 +1130,8 @@ class Game:
                     self.paused = not self.paused
                 if event.key == pg.K_o:
                     self.show_go_screen()
+                if event.key == pg.K_x:
+                    self.add_xp(3)
                 if event.key == pg.K_e:
                     try:
                         self.dialogue(self.nearest_npc(), "story")
@@ -1113,7 +1143,8 @@ class Game:
                     self.night = not self.night
                 if event.key == pg.K_0:
                     self.info_update()
-                    write_file("save", "coins", read_file("save","coins")+2)
+                    self.get_coin(2)
+                    # write_file("save", "coins", read_file("save","coins")+2)
                     self.coins = read_file("save", "coins")
                     print("+2 Coins")
                     self.get_ammo()

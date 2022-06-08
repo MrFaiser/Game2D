@@ -27,7 +27,7 @@
     ],
     "10XP": [
         {
-            "activ": false,
+            "activ": true,
             "completed": false,
             "text": "text",
             "description": "geb mir 10 XP",
@@ -43,7 +43,7 @@
             "activ": false,
             "completed": false,
             "text": "text",
-            "description": "geb mir 20 XP",
+            "description": "geb mir 20 XP... du KLEINER!! @#!X/9 ",
             "require": 20,
             "currency": "XP",
             "reward_xp": 120,

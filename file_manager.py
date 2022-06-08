@@ -121,6 +121,16 @@ def get_completed_quests():
                 quests.append(i)
         return quests
 
+def set_quest_completed(nameFromQuest):
+    with open("files/quest_settings.json", "r") as File:
+        data = json.load(File)
+
+    for k in data[nameFromQuest]:
+        k["completed"] = True
+
+    with open("files/quest_settings.json", "w") as File:
+        File.write(json.dumps(data, indent=4))
+
 def get_open_quests():
     print("r", "open")
     with open('files/quest_settings.json', 'r') as File:
@@ -131,22 +141,28 @@ def get_open_quests():
                 quests.append(i)
         return quests
 
-def is_avtiv(NameDerQuest):
+def is_avtiv(nameFromQuest):
     print("r", "activ")
-    for i in data:
-        if read_quest_file(NameDerQuest, "activ"):
+
+    for i in get_Quest_file():
+        if read_quest_file(nameFromQuest, "activ"):
             return True
 
-def set_avtiv(NameDerQuest):
+def set_avtiv(nameFromQuest):
     print("wQa")
     with open("files/quest_settings.json", "r") as File:
         data = json.load(File)
 
-    for k in data[NameDerQuest]:
+    for k in data[nameFromQuest]:
         k["activ"] = True
 
     with open("files/quest_settings.json", "w") as File:
         File.write(json.dumps(data, indent=4))
+
+def get_quest_attribute(nameFromQuest, attribute):
+        for i in get_Quest_file()[nameFromQuest]:
+            result = i[attribute]
+        return result
 
 
 file = {

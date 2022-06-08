@@ -2,7 +2,7 @@
     "welcome": [
         {
             "activ": true,
-            "completed": false,
+            "completed": true,
             "text": "text",
             "description": "sprech mit dem quest boy",
             "require": 0,
@@ -14,7 +14,7 @@
     ],
     "100Coins": [
         {
-            "activ": true,
+            "activ": false,
             "completed": false,
             "text": "text",
             "description": "geb mir 100 coins",
@@ -40,10 +40,10 @@
     ],
     "20XP": [
         {
-            "activ": true,
+            "activ": false,
             "completed": false,
             "text": "text",
-            "description": "geb mir 20 XP",
+            "description": "geb mir 20 XP... du KLEINER!! @#!X/9 ",
             "require": 20,
             "currency": "XP",
             "reward_xp": 120,
