@@ -2,20 +2,22 @@
     "welcome": [
         {
             "activ": true,
-            "completed": true,
+            "completed": false,
+            "available": true,
             "text": "text",
             "description": "sprech mit dem quest boy",
             "require": 0,
             "currency": "coins",
-            "reward_xp": 0,
-            "reward_coin": 0,
+            "reward_xp": 20,
+            "reward_coin": 20,
             "reward_text": "viel erfolg noch. brooo"
         }
     ],
     "100Coins": [
         {
-            "activ": false,
+            "activ": true,
             "completed": false,
+            "available": true,
             "text": "text",
             "description": "geb mir 100 coins",
             "require": 100,
@@ -29,6 +31,7 @@
         {
             "activ": false,
             "completed": false,
+            "available": false,
             "text": "text",
             "description": "geb mir 10 XP",
             "require": 10,
@@ -40,8 +43,9 @@
     ],
     "20XP": [
         {
-            "activ": false,
+            "activ": true,
             "completed": false,
+            "available": true,
             "text": "text",
             "description": "geb mir 20 XP... du KLEINER!! @#!X/9 ",
             "require": 20,

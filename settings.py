@@ -28,12 +28,16 @@ LIGHT_PURPLE = (200, 0, 200)
 
 # game settings
 #True False
-full = False
-WIDTH = 1000  # 16 * 64 or 32 * 32 or 64 * 16
-HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
-if full:
+size = 2
+if size == 1:
     WIDTH = 1920  # 16 * 64 or 32 * 32 or 64 * 16
     HEIGHT = 1080  # 16 * 48 or 32 * 24 or 64 * 12
+elif size == 2:
+    WIDTH = 1000  # 16 * 64 or 32 * 32 or 64 * 16
+    HEIGHT = 700  # 16 * 48 or 32 * 24 or 64 * 12
+elif size == 3:
+    WIDTH = 500  # 16 * 64 or 32 * 32 or 64 * 16
+    HEIGHT = 500  # 16 * 48 or 32 * 24 or 64 * 12
 
 FPS = 60
 TITLE = "Titelfenster lol"
@@ -47,7 +51,7 @@ GRIDHEIGHT = HEIGHT / TILESIZE
 #PLAYER_HEALTH = 20
 PLAYER_SPEED = 280
 PLAYER_ROT_SPEED = 300
-PLAYER_IMG = 'manBlue_gun.png'
+PLAYER_IMG = 'mob/player.png'
 PLAYER_HIT_RECT = pg.Rect(0, 0, 40, 40)
 BARREL_OFFSET = vec(30, 10)
 
@@ -102,7 +106,7 @@ WEAPONS['laser'] = {'bullet_speed': 1000,
 
 # Mob settings
 MOBS = {}
-MOBS["zombie"] = {"mob_img": "zombie1_hold.png",
+MOBS["zombie"] = {"mob_img": "mob/zombie1_hold.png",
                   "mob_speed": [150, 100, 75, 125],
                   "mob_hit_rect": pg.Rect(0, 0, 30, 30),
                   "mob_health": 100,
@@ -112,7 +116,7 @@ MOBS["zombie"] = {"mob_img": "zombie1_hold.png",
                   "detect_radius":400,
                   "xp_reward":10,
                   "coin_reward":1}
-MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
+MOBS["zombie_strong"] = {"mob_img": "mob/zombie_strong.png",
                   "mob_speed": [200, 10],
                   "mob_hit_rect": pg.Rect(0, 0, 30, 30),
                   "mob_health": 400,
@@ -125,7 +129,7 @@ MOBS["zombie_strong"] = {"mob_img": "zombie_strong.png",
 
 NPC_INTERACT_RANGE = 100
 NPCS = {}
-NPCS["npc"] = {"npc_img": "npc.png",
+NPCS["npc"] = {"npc_img": "mob/npc.png",
                   "npc_speed": [0],
                   "npc_hit_rect": pg.Rect(0, 0, 30, 30),
                   "npc_health": 100,
@@ -135,7 +139,17 @@ NPCS["npc"] = {"npc_img": "npc.png",
                   "detect_radius":400,
                   "xp_reward":10,
                   "coin_reward":1}
-NPCS["npc_gun"] = {"npc_img": "npc_gun.png",
+NPCS["npc_gun"] = {"npc_img": "mob/npc_gun.png",
+                  "npc_speed": [0],
+                  "npc_hit_rect": pg.Rect(0, 0, 30, 30),
+                  "npc_health": 400,
+                  "npc_damage": 20,
+                  "npc_knockback": 40,
+                  "avoid_radius":20,
+                  "detect_radius":200,
+                  "xp_reward":23.8,
+                  "coin_reward": 2}
+NPCS["npc_quest_boy"] = {"npc_img": "mob/npc_quest_boy.png",
                   "npc_speed": [0],
                   "npc_hit_rect": pg.Rect(0, 0, 30, 30),
                   "npc_health": 400,
@@ -174,19 +188,19 @@ ITEM_LIST = []
 ITEM_LIST= ['health',
             "max_health_up", "health_pack_up", "auto_reg_up", "auto_reg_amount", "show_player_hp",
             "pistol", "shotgun", "sniper", "rifle"]
-ITEM_IMAGES = {'health': 'health_pack.png',
+ITEM_IMAGES = {'health': 'item/health_pack.png',
 
-               "max_health_up": "max_health_up.png",
-               "health_pack_up": "health_pack_up.png",
-               "auto_reg_up": "auto_reg_up.png",
-               "auto_reg_amount": "auto_reg_amount.png",
-               "show_player_hp": "show_player_hp.png",
+               "max_health_up": "item/max_health_up.png",
+               "health_pack_up": "item/health_pack_up.png",
+               "auto_reg_up": "item/auto_reg_up.png",
+               "auto_reg_amount": "item/auto_reg_amount.png",
+               "show_player_hp": "item/show_player_hp.png",
 
-               "pistol": "pistol.png",
-               "shotgun": "shotgun.png",
-               "sniper": "sniper.png",
-               "rifle": "rifle.png",
-               "laser": "laser.png"}
+               "pistol": "item/pistol.png",
+               "shotgun": "item/shotgun.png",
+               "sniper": "item/sniper.png",
+               "rifle": "item/rifle.png",
+               "laser": "item/laser.png"}
 
 # Maps
 #CURRENT_LEVEL = 0
@@ -219,18 +233,18 @@ LVL_LIST= ["door_auto",
            "doorlvl9",
            "doorlvl10",
            "doorlvl11"]
-LVL_IMAGES = {'door_auto': 'door_enter.png',
-               "doorlvl1": "doorlvl1.png",
-               "doorlvl2": "doorlvl2.png",
-               "doorlvl3": "doorlvl3.png",
-               "doorlvl4": "doorlvl4.png",
-               "doorlvl5": "doorlvl5.png",
-               "doorlvl6": "doorlvl6.png",
-               "doorlvl7": "doorlvl7.png",
-               "doorlvl8": "doorlvl8.png",
-               "doorlvl9": "doorlvl9.png",
-               "doorlvl10": "doorlvl10.png",
-               "doorlvl11": "doorlvl10.png"}
+LVL_IMAGES = {'door_auto': 'doors/door_enter.png',
+               "doorlvl1": "doors/doorlvl1.png",
+               "doorlvl2": "doors/doorlvl2.png",
+               "doorlvl3": "doors/doorlvl3.png",
+               "doorlvl4": "doors/doorlvl4.png",
+               "doorlvl5": "doors/doorlvl5.png",
+               "doorlvl6": "doors/doorlvl6.png",
+               "doorlvl7": "doors/doorlvl7.png",
+               "doorlvl8": "doors/doorlvl8.png",
+               "doorlvl9": "doors/doorlvl9.png",
+               "doorlvl10": "doors/doorlvl10.png",
+               "doorlvl11": "doors/doorlvl10.png"}
 
 
 

@@ -42,7 +42,8 @@ data = {
 
             #NPC
             "npc": 0,
-            "npc_gun": 0
+            "npc_gun": 0,
+            "npc_quest_boy": 0
 
         }
     ]
@@ -111,13 +112,23 @@ def get_all_activ_quest():
                 quests.append(i)
         return quests
 
-def get_completed_quests():
+def get_all_completed_quests():
     print("r", "complete")
     with open('files/quest_settings.json', 'r') as File:
         daten = json.load(File)
         quests = []
         for i in daten:
             if read_quest_file(i, "completed"):
+                quests.append(i)
+        return quests
+
+def get_all_available_quests():
+    print("r", "complete")
+    with open('files/quest_settings.json', 'r') as File:
+        daten = json.load(File)
+        quests = []
+        for i in daten:
+            if read_quest_file(i, "available"):
                 quests.append(i)
         return quests
 
@@ -131,7 +142,7 @@ def set_quest_completed(nameFromQuest):
     with open("files/quest_settings.json", "w") as File:
         File.write(json.dumps(data, indent=4))
 
-def get_open_quests():
+def get_all_not_completed_quests():
     print("r", "open")
     with open('files/quest_settings.json', 'r') as File:
         daten = json.load(File)
@@ -139,6 +150,17 @@ def get_open_quests():
         for i in daten:
             if read_quest_file(i, "completed") == False:
                 quests.append(i)
+        return quests
+
+def get_all_not_completed_but_activ_quests():
+    print("r", "open")
+    with open('files/quest_settings.json', 'r') as File:
+        daten = json.load(File)
+        quests = []
+        for i in daten:
+            if read_quest_file(i, "completed") == False:
+                if read_quest_file(i, "activ") == True:
+                    quests.append(i)
         return quests
 
 def is_avtiv(nameFromQuest):
@@ -163,6 +185,7 @@ def get_quest_attribute(nameFromQuest, attribute):
         for i in get_Quest_file()[nameFromQuest]:
             result = i[attribute]
         return result
+
 
 
 file = {
@@ -193,3 +216,4 @@ file = {
         }
     ]
 }
+

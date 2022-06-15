@@ -29,15 +29,17 @@ npc_gun["story"]    = {     "story1":           "story text1",
                             "story2":           "story text22",
                             "story3":           "story text333",
                             "story4":           "story text4444"}
-quest_boy = {}
-quest_boy["welcome"]= {     "welcome":          "ich gebe dir quest"}
-quest_boy["random"] = {     "random1":          "ich hab gerade keine quest",
-                            "random2":          "such weiter",
-                            "random3":          "ich glaub an dich, bro"}
-quest_boy["quest"]  = {     "quest1":           "quest text11111",
-                            "quest2":           "quest text22222222",
-                            "quest3":           "quest text3333333333",
-                            "quest4":           "quest text444444444444"}
+
+npc_quest_boy = {}
+npc_quest_boy["welcome"]= { "welcome":      "ich gebe dir quest"}
+npc_quest_boy["random"] = { "random1":      "mal schauen was ich für dich habe",
+                            "random2":      "ob du das kannst...",
+                            "random3":      "wurde aber auch langsam zeit, dass du wieder kommst -.-"}
+
+npc_quest_boy["quest"]  = { "quest1":       "Schau dir direkt deine 1. Quest an!",
+                            "quest2":           "Ich hab wieder was im Angebot",
+                            "quest3":           "Neue Quest's sind da...",
+                            "quest4":           "Wie du es gern hast... frische Lieferung"}
 
 
 
