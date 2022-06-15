@@ -12,4 +12,5 @@
 0.3.1.1 npc rdm text 
 0.4 	quest book add 
 0.4.1 	quest reward  
+0.4.1.1 quest npc
 

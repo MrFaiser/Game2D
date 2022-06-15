@@ -79,6 +79,8 @@ def write_file(region, key, wert):
     with open("files/data.json", "w") as File:
         File.write(json.dumps(data, indent=4))
 
+#######################################################
+#GET
 def get_Quest_file():
     print("oQ")
     with open('files/quest_settings.json', 'r') as f:
@@ -163,6 +165,13 @@ def get_all_not_completed_but_activ_quests():
                     quests.append(i)
         return quests
 
+def get_quest_attribute(nameFromQuest, attribute):
+        for i in get_Quest_file()[nameFromQuest]:
+            result = i[attribute]
+        return result
+
+#######################################################
+#IS
 def is_avtiv(nameFromQuest):
     print("r", "activ")
 
@@ -170,6 +179,9 @@ def is_avtiv(nameFromQuest):
         if read_quest_file(nameFromQuest, "activ"):
             return True
 
+
+#######################################################
+#SET
 def set_avtiv(nameFromQuest):
     print("wQa")
     with open("files/quest_settings.json", "r") as File:
@@ -181,10 +193,17 @@ def set_avtiv(nameFromQuest):
     with open("files/quest_settings.json", "w") as File:
         File.write(json.dumps(data, indent=4))
 
-def get_quest_attribute(nameFromQuest, attribute):
-        for i in get_Quest_file()[nameFromQuest]:
-            result = i[attribute]
-        return result
+def set_available(nameFromQuest):
+    print("wQa")
+    with open("files/quest_settings.json", "r") as File:
+        data = json.load(File)
+
+    for k in data[nameFromQuest]:
+        k["available"] = True
+
+    with open("files/quest_settings.json", "w") as File:
+        File.write(json.dumps(data, indent=4))
+
 
 
 

@@ -7,7 +7,7 @@
             "xp": 965,
             "xp_points": 135.81599999999975,
             "sprint_speed": 3,
-            "hp": 200,
+            "hp": 193,
             "max_hp": 200,
             "auto_reg_time": 6.5,
             "auto_reg_amount": 1,
@@ -21,7 +21,7 @@
             "UPGRADE_LEVEL_auto_reg_up_time": 0,
             "UPGRADE_LEVEL_auto_reg_amount": 0,
             "UPGRADE_LEVEL_show_player_hp": 1,
-            "pistol_ammo": 1021980,
+            "pistol_ammo": 1021981,
             "shotgun_ammo": 12312312241,
             "sniper_ammo": 123213206,
             "rifle_ammo": 1123122964,
@@ -29,7 +29,7 @@
             "compas_lvl": 3,
             "compas_all": false,
             "npc": 4,
-            "npc_gun": 5,
+            "npc_gun": 1,
             "npc_quest_boy": 5
         }
     ]

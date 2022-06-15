@@ -632,8 +632,7 @@ class Game:
         self.draw_text(trennlinie, self.title_font, 10, LIGHT_GREY, WIDTH / 2, shopY + 50, align="center")
 
         # write text
-        self.draw_text("Du hast Folgende Quest's offen!", self.hud_font, 40, LIGHT_GREY, WIDTH / 2, shopY + 100,
-                       align="center")
+        self.draw_text("Du hast Folgende Quest's offen!", self.hud_font, 40, LIGHT_GREY, WIDTH / 2, shopY + 100,align="center")
         # self.draw_text("Aktiv", self.hud_font, 30, WHITE, WIDTH / 10-10, shopY + 170, align="ne")
         self.draw_text("Name", self.hud_font, 30, CYAN, WIDTH / 10, shopY + 155, align="nw")
         self.draw_text("Belohnungen", self.hud_font, 30, CYAN, WIDTH / 2 - WIDTH / 7, shopY + 155, align="n")
@@ -777,12 +776,17 @@ class Game:
                 return True
             else:
                 return False
-
-
         elif currency == "item":
             pass
         else:
             pass
+
+    def update_quest_event(self):
+        if read_file("save", "UPGRADE_LEVEL_max_health_up") == 1:
+            write_file("save", "npc_quest_boy", 6)
+            set_available("maxHPtoLVL1")
+
+
 
     def buy_upgrade(self, item):
         if self.buy_cooldown == False:
@@ -1085,6 +1089,7 @@ class Game:
 
                 # Quest boy
                 elif textMode == "quest":
+                    self.update_quest_event()
                     textGroup = textMode + str(storyLVL)
                     try:
                         text = globals()[npcType][textMode][textGroup]
@@ -1140,7 +1145,6 @@ class Game:
                         continues = False
             pygame.display.flip()
             blit_text(self.screen, text, (40, HEIGHT - 140), font)
-
 
     def nearest_npc(self):
         dist_all = []

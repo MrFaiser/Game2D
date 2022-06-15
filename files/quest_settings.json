@@ -15,9 +15,9 @@
     ],
     "100Coins": [
         {
-            "activ": true,
+            "activ": false,
             "completed": false,
-            "available": true,
+            "available": false,
             "text": "text",
             "description": "geb mir 100 coins",
             "require": 100,
@@ -42,6 +42,20 @@
         }
     ],
     "20XP": [
+        {
+            "activ": false,
+            "completed": false,
+            "available": false,
+            "text": "text",
+            "description": "geb mir 20 XP... du KLEINER!! @#!X/9 ",
+            "require": 20,
+            "currency": "XP",
+            "reward_xp": 120,
+            "reward_coin": 300,
+            "reward_text": "als belohnung 300Coins"
+        }
+    ],
+    "maxHP": [
         {
             "activ": false,
             "completed": false,
