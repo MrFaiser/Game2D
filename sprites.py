@@ -234,8 +234,11 @@ class Mob(pg.sprite.Sprite):
             col = RED
         width = int(self.rect.width * self.health / MOBS[self.type]["mob_health"])
         self.health_bar = pg.Rect(0, 0, width, 7)
+        # self.health_bar_back = pg.Rect(0, 0, self.rect.width * self.health/4, 7)
+        # pg.draw.rect(self.image, BLACK, self.health_bar_back)
         if self.health < MOBS[self.type]["mob_health"]:
             pg.draw.rect(self.image, col, self.health_bar)
+
 
 
 class Npc(pg.sprite.Sprite):

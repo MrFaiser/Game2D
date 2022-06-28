@@ -7,12 +7,16 @@ import sprites
 
 data = {
     'save': [
-        {   #player stats
+        {   #game stats
             'name': "user",
             'current_level': -1,
             'coins': 0,
             'xp': 0,
             'xp_points': 0,
+            #inf
+            "inventory": {},
+
+            #player stats
             "sprint_speed": 1.5,
             "hp": 20,
             "max_hp": 20,
@@ -79,7 +83,47 @@ def write_file(region, key, wert):
     with open("files/data.json", "w") as File:
         File.write(json.dumps(data, indent=4))
 
+
+
 #######################################################
+#INVENTORY#
+#GET
+def get_inventory(region):
+    print("r", "inventory")
+    with open('files/data.json', 'r') as File:
+        daten = json.load(File)
+        for i in daten[region]:
+            result = i["inventory"]
+        return result
+
+def get_amount_from_item_in_inventory(region, item):
+    if is_item_in_inventory(region, item):
+        result = get_inventory(region)[item]
+        return result
+    else:
+        return -1
+
+
+#IS
+def is_item_in_inventory(region, item):
+    if item in get_inventory(region):
+        return True
+    else:
+        return False
+
+#SET - ADD
+def add_item_to_inventory(region, item, amount):
+    if is_item_in_inventory(region, item):
+        temp = get_inventory(region)
+        temp[item] = get_amount_from_item_in_inventory(region, item) + amount
+        write_file(region, "inventory", temp)
+        print("ist drin... ")
+    else:
+        print("add neu")
+
+
+#######################################################
+#QUEST#
 #GET
 def get_Quest_file():
     print("oQ")
@@ -134,6 +178,17 @@ def get_all_available_quests():
                 quests.append(i)
         return quests
 
+def get_all_available_and_not_completet_quests():
+    print("r", "complete")
+    with open('files/quest_settings.json', 'r') as File:
+        daten = json.load(File)
+        quests = []
+        for i in daten:
+            if read_quest_file(i, "available"):
+                if not read_quest_file(i, "completed"):
+                    quests.append(i)
+        return quests
+
 def set_quest_completed(nameFromQuest):
     with open("files/quest_settings.json", "r") as File:
         data = json.load(File)
@@ -179,6 +234,13 @@ def is_avtiv(nameFromQuest):
         if read_quest_file(nameFromQuest, "activ"):
             return True
 
+def is_completed(nameFromQuest):
+    print("r", "completed")
+
+    for i in get_Quest_file():
+        if read_quest_file(nameFromQuest, "completed"):
+            return True
+
 
 #######################################################
 #SET
@@ -206,7 +268,8 @@ def set_available(nameFromQuest):
 
 
 
-
+#######################################################
+#DEMO
 file = {
     "welcome": [
         {

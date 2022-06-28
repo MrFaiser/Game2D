@@ -36,7 +36,7 @@ npc_quest_boy["random"] = { "random1":      "mal schauen was ich für dich habe"
                             "random2":      "ob du das kannst...",
                             "random3":      "wurde aber auch langsam zeit, dass du wieder kommst -.-"}
 
-npc_quest_boy["quest"]  = { "quest1":       "Schau dir direkt deine 1. Quest an!",
+npc_quest_boy["quest"]  = { "quest0":       "Schau dir direkt deine 1. Quest an!",
                             "quest2":       "Ich hab wieder was im Angebot",
                             "quest3":       "Neue Quest's sind da...",
                             "quest4":       "Wie du es gern hast... frische Lieferung",

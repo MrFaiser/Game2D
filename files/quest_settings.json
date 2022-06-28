@@ -3,11 +3,11 @@
         {
             "activ": false,
             "completed": false,
-            "available": true,
+            "available": false,
             "text": "text",
             "description": "sprech mit dem quest boy",
             "require": 0,
-            "currency": "coins",
+            "currency": "none",
             "reward_xp": 20,
             "reward_coin": 20,
             "reward_text": "viel erfolg noch. brooo"
@@ -24,7 +24,7 @@
             "currency": "coins",
             "reward_xp": 100,
             "reward_coin": 50,
-            "reward_text": "hier noch mal 50Coins kek"
+            "reward_text": "hier noch mal 50Coins du kek"
         }
     ],
     "10XP": [
@@ -55,18 +55,60 @@
             "reward_text": "als belohnung 300Coins"
         }
     ],
-    "maxHP": [
+    "LVL2maxHP": [
+        {
+            "activ": true,
+            "completed": true,
+            "available": true,
+            "text": "text",
+            "description": "verbessere deine HP auf Stufe 2",
+            "require": "UPGRADE_LEVEL_max_health_up  2",
+            "currency": "level",
+            "reward_xp": 2,
+            "reward_coin": 0,
+            "reward_text": "hier 2xp, kauf dir was nettes"
+        }
+    ],
+    "LVL5maxHP": [
+        {
+            "activ": true,
+            "completed": true,
+            "available": true,
+            "text": "text",
+            "description": "verbessere deine HP auf Stufe 5",
+            "require": "UPGRADE_LEVEL_max_health_up  5",
+            "currency": "level",
+            "reward_xp": 5,
+            "reward_coin": 0,
+            "reward_text": "hier 5xp, kauf dir was nettes"
+        }
+    ],
+    "LVL25maxHP": [
         {
             "activ": false,
             "completed": false,
             "available": true,
             "text": "text",
-            "description": "geb mir 20 XP... du KLEINER!! @#!X/9 ",
-            "require": 20,
-            "currency": "XP",
-            "reward_xp": 120,
-            "reward_coin": 300,
-            "reward_text": "als belohnung 300Coins"
+            "description": "verbessere deine HP auf Stufe 25",
+            "require": "UPGRADE_LEVEL_max_health_up 25",
+            "currency": "level",
+            "reward_xp": 2500,
+            "reward_coin": 0,
+            "reward_text": "hier 2500xp, kauf dir was nettes"
+        }
+    ],
+    "LVL100maxHP": [
+        {
+            "activ": false,
+            "completed": false,
+            "available": false,
+            "text": "text",
+            "description": "verbessere deine HP auf Stufe 100",
+            "require": "UPGRADE_LEVEL_max_health_up 100",
+            "currency": "level",
+            "reward_xp": 20000,
+            "reward_coin": 0,
+            "reward_text": "hier 25.000xp, kauf dir was nettes"
         }
     ]
 }

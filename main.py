@@ -332,12 +332,11 @@ class Game:
                                     Item(self, obj_center, tile_object.name)
                         # Loop End Item Respawn
                     # loop reg start
-                    if self.player.auto_reg_up >= 1:
+                    if self.player.health < self.player.max_health:
                         if (time_now - time_start_auto_reg) >= self.player.auto_reg_up:
-                            if self.player.health < self.player.max_health:
+                            if read_file("save", "UPGRADE_LEVEL_auto_reg_up_time") >= 1:
                                 time_start_auto_reg = time.time()
                                 self.player.add_health(self.player.auto_reg_amount)
-                                write_file("save", "hp", self.player.health)
                     # loop reg end
                     # Buy cooldown start
                     if self.buy_cooldown == True:
@@ -487,6 +486,7 @@ class Game:
             for bullet in hits[mob]:
                 mob.health -= bullet.damage
             mob.vel = vec(0, 0)
+        # Mob.draw_health(mob)
 
     def create_shop_frame(self, item, text1, text2, text3,
                           cur_lvl, cur_value, cost_to_nxt_lvl, currency,
@@ -610,7 +610,7 @@ class Game:
 
         self.screen.blit(self.dim_screen, (0, 0))
 
-        allAvailableList = get_all_available_quests()
+        allAvailableList = get_all_available_and_not_completet_quests()
         AvailableActivList = []
         AvailableNameList = []
         AvailableCoinRewardList = []
@@ -704,13 +704,13 @@ class Game:
 
             qXP = 1
             for i in AvailableXpRewardList:
-                self.draw_text("C / XP ", self.hud_font, 25, BLACK, WIDTH / 2 - WIDTH / 6, shopY + 150 + (50 * qXP),
+                self.draw_text("C-XP ", self.hud_font, 25, BLACK, WIDTH / 2 - WIDTH / 6, shopY + 150 + (50 * qXP),
                                align="nw")
                 if WIDTH >= 1700:
                     self.draw_text("{}".format(i), self.hud_font, 25, PINK, WIDTH / 2.6, shopY + 150 + (50 * qXP),
                                    align="nw")
                 else:
-                    self.draw_text("{}".format(i), self.hud_font, 25, PINK, WIDTH / 2.35, shopY + 150 + (50 * qXP),
+                    self.draw_text("{}".format(i), self.hud_font, 25, PINK, WIDTH / 2.5, shopY + 150 + (50 * qXP),
                                    align="nw")
                 qXP = qXP + 1
 
@@ -745,7 +745,6 @@ class Game:
             self.dialogue("alert", MSG)
 
     def finish_quest(self, quest):
-        print(quest)
         currency = get_quest_attribute(quest, "currency")
         require = get_quest_attribute(quest, "require")
         if currency == "coins":
@@ -776,15 +775,40 @@ class Game:
                 return True
             else:
                 return False
+        elif currency == "level":
+            if read_file("save", require[:-3].strip()) >= int(require[-3:]):
+                # take away
+
+                # get reward
+                self.add_xp(get_quest_attribute(quest, "reward_xp"))
+                self.add_coin(get_quest_attribute(quest, "reward_coin"))
+
+                # update quest
+                set_quest_completed(quest)
+                return True
+            else:
+                return False
         elif currency == "item":
             pass
+        elif currency == "none":
+            # get reward
+            self.add_xp(get_quest_attribute(quest, "reward_xp"))
+            self.add_coin(get_quest_attribute(quest, "reward_coin"))
+
+            # update quest
+            set_quest_completed(quest)
+            return True
         else:
             pass
 
     def update_quest_event(self):
-        if read_file("save", "UPGRADE_LEVEL_max_health_up") == 1:
-            write_file("save", "npc_quest_boy", 6)
-            set_available("maxHPtoLVL1")
+        if get_quest_attribute("LVL2maxHP", "available") == False and read_file("save", "UPGRADE_LEVEL_max_health_up") >= 1:
+            set_available("LVL2maxHP")
+        elif get_quest_attribute("LVL5maxHP", "available") == False and is_completed("LVL2maxHP"):
+            set_available("LVL5maxHP")
+        elif get_quest_attribute("LVL25maxHP", "available") == False and is_completed("LVL5maxHP"):
+            set_available("LVL25maxHP")
+
 
 
 
@@ -1004,10 +1028,9 @@ class Game:
                        DARK_GREY, 10, 100, align="w")
         self.draw_text("Zombies: {}".format(len(self.mobs)), self.hud_font, 30, DARK_GREEN, 10, 130, align="w")
         self.draw_text("Coins: {}".format(self.coins), self.hud_font, 30, ORANGE, 10, 160, align="w")
-        self.draw_text("XP lvl: {}".format(self.xp_lvl), self.hud_font, 30, YELLOW, 10, 190, align="w")
+        self.draw_text("XP lvl: {}".format(int(self.xp_lvl)), self.hud_font, 30, YELLOW, 10, 190, align="w")
 
-        self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, BLACK, WIDTH - 50, 10,
-                       align="center")
+        self.draw_text("FPS {:.2f}".format(self.clock.get_fps()), self.hud_font, 20, BLACK, WIDTH - 50, 10,align="center")
 
         if self.paused:
             self.screen.blit(self.dim_screen, (0, 0))
@@ -1036,8 +1059,9 @@ class Game:
             self.xp_points = self.xp_points % xp_needed
             xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
 
-            write_file("save", "xp", self.xp_lvl)
-            write_file("save", "xp_points", self.xp_points)
+        write_file("save", "xp", self.xp_lvl)
+        write_file("save", "xp_points", self.xp_points)
+
 
     def use_compas(self):
         dist_all = []
@@ -1194,6 +1218,14 @@ class Game:
                         print("Kein NPC in der Nähe!")
                 if event.key == pg.K_c:
                     self.create_quest_frame()
+                if event.key == pg.K_i:
+                    print("inv")
+                    # print(get_inventory("save"))
+                    # print(is_item_in_inventory("save", "baum"))
+                    #print(get_amount_from_item_in_inventory("save", "baum"))
+                    print(add_item_to_inventory("save", "fuchs", 10))
+
+
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:

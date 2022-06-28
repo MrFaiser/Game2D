@@ -13,4 +13,5 @@
 0.4 	quest book add 
 0.4.1 	quest reward  
 0.4.1.1 quest npc
+0.4.1.2 quest updater
 
