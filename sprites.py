@@ -56,6 +56,7 @@ class Player(pg.sprite.Sprite):
         self.damaged = False
         self.out_of_stamina = False
         self.sprinting = False
+        self.inventory = get_inventory("save")
 
     def get_keys(self):
         self.rot_speed = 0

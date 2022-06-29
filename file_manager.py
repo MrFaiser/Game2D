@@ -94,7 +94,7 @@ def get_inventory(region):
         daten = json.load(File)
         for i in daten[region]:
             result = i["inventory"]
-        return result
+        return update_inventory(region, result)
 
 def get_amount_from_item_in_inventory(region, item):
     if is_item_in_inventory(region, item):
@@ -102,7 +102,6 @@ def get_amount_from_item_in_inventory(region, item):
         return result
     else:
         return -1
-
 
 #IS
 def is_item_in_inventory(region, item):
@@ -116,10 +115,27 @@ def add_item_to_inventory(region, item, amount):
     if is_item_in_inventory(region, item):
         temp = get_inventory(region)
         temp[item] = get_amount_from_item_in_inventory(region, item) + amount
-        write_file(region, "inventory", temp)
-        print("ist drin... ")
     else:
-        print("add neu")
+        temp = get_inventory(region)
+        temp[item] = amount
+    write_file(region, "inventory", temp)
+
+def remove_item_from_inventory(region, item, amount):
+    if is_item_in_inventory(region, item):
+        temp = get_inventory(region)
+        temp[item] = temp[item] - amount
+        write_file(region, "inventory", temp)
+
+def update_inventory(region, temp):
+    changes = False
+    for k in list(temp):
+        if temp[k] <= 0:
+            temp.pop(k)
+            changes = True
+    if changes:
+        write_file(region, "inventory", sorted(temp))
+    return temp
+
 
 
 #######################################################

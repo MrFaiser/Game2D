@@ -11,12 +11,14 @@ from npc_settings import *
 from tilemap import *
 
 # HUD functions
+account = "save"
 try:
-    hp = read_file("save", "hp")
-    st = read_file("save", "stamina")
+    hp = read_file(account, "hp")
+    st = read_file(account, "stamina")
 except:
     hp = 20
     st = 20
+
 
 
 def draw_player_health(surf, x, y, pct):
@@ -164,13 +166,13 @@ class Game:
             path.join(img_folder, NPCS["npc_quest_boy"]["npc_img"])).convert_alpha()
 
         # Player Stats Start
-        self.coins = read_file("save", "coins")
-        self.xp_lvl = read_file("save", "xp")
-        self.xp_points = read_file("save", "xp_points")
-        self.ammo = read_file("save", "pistol_ammo")
-        self.compas_lvl = read_file("save", "compas_lvl")
-        self.compas_all = read_file("save", "compas_all")
-        self.current_level = read_file("save", "current_level")
+        self.coins = read_file(account, "coins")
+        self.xp_lvl = read_file(account, "xp")
+        self.xp_points = read_file(account, "xp_points")
+        self.ammo = read_file(account, "pistol_ammo")
+        self.compas_lvl = read_file(account, "compas_lvl")
+        self.compas_all = read_file(account, "compas_all")
+        self.current_level = read_file(account, "current_level")
         # Player Stats End
 
         self.splat = pg.image.load(path.join(img_folder, SPLAT)).convert_alpha()
@@ -238,12 +240,10 @@ class Game:
         self.players = pg.sprite.Group()
         self.items = pg.sprite.Group()
         try:
-            #            self.map = TiledMap(path.join(self.map_folder, MAPS[read_file("save", "CURRENT_LEVEL")]))
             self.map = TiledMap(path.join(self.map_folder, level))
         except:
             self.map = TiledMap(path.join(self.map_folder, "home.tmx"))
             print("enter home")
-            # write_file("save","CURRENT_LEVEL", self.current_level-1)
 
         self.map_img = self.map.make_map()
         self.map.rect = self.map_img.get_rect()
@@ -285,13 +285,14 @@ class Game:
         self.paused = False
         self.shop = False
         self.quest_book = False
+        self.inventory = False
         self.night = False
         self.lvl_fin = False
         self.compas_is_used = False
         self.level_selectet = False
         self.buy_cooldown = False
-        self.show_hp = read_file("save", "UPGRADE_LEVEL_show_player_hp")
-        self.health_pack = read_file("save", "health_pack")
+        self.show_hp = read_file(account, "UPGRADE_LEVEL_show_player_hp")
+        self.health_pack = read_file(account, "health_pack")
         self.effects_sounds['level_start'].play().set_volume(0.2)
         self.info_update()
 
@@ -334,7 +335,7 @@ class Game:
                     # loop reg start
                     if self.player.health < self.player.max_health:
                         if (time_now - time_start_auto_reg) >= self.player.auto_reg_up:
-                            if read_file("save", "UPGRADE_LEVEL_auto_reg_up_time") >= 1:
+                            if read_file(account, "UPGRADE_LEVEL_auto_reg_up_time") >= 1:
                                 time_start_auto_reg = time.time()
                                 self.player.add_health(self.player.auto_reg_amount)
                     # loop reg end
@@ -355,19 +356,19 @@ class Game:
         sys.exit()
 
     def info_update(self):
-        self.ammo = read_file("save", self.player.weapon + "_ammo")
-        self.coins = read_file("save", "coins")
-        self.xp_lvl = read_file("save", "xp")
-        self.player.health = read_file("save", "hp")
-        self.player.max_health = read_file("save", "max_hp")
-        self.player.auto_reg_up = read_file("save", "auto_reg_time")
-        self.player.auto_reg_amount = read_file("save", "auto_reg_amount")
+        self.ammo = read_file(account, self.player.weapon + "_ammo")
+        self.coins = read_file(account, "coins")
+        self.xp_lvl = read_file(account, "xp")
+        self.player.health = read_file(account, "hp")
+        self.player.max_health = read_file(account, "max_hp")
+        self.player.auto_reg_up = read_file(account, "auto_reg_time")
+        self.player.auto_reg_amount = read_file(account, "auto_reg_amount")
 
         print("info update:", time.time())
 
     def get_ammo(self):
-        write_file("save", self.player.weapon + "_ammo",
-                   read_file("save", self.player.weapon + "_ammo") + WEAPONS[self.player.weapon]["ammo"])
+        write_file(account, self.player.weapon + "_ammo",
+                   read_file(account, self.player.weapon + "_ammo") + WEAPONS[self.player.weapon]["ammo"])
 
     def update(self):
         # update portion of the game loop
@@ -386,43 +387,43 @@ class Game:
                 hit.kill()
                 self.home_completed()
             elif hit.type == "doorlvl1":
-                if read_file("save", "current_level") >= 1:
+                if read_file(account, "current_level") >= 1:
                     hit.kill()
                     self.enter_level_from_home("lvl1.tmx")
             elif hit.type == "doorlvl2":
-                if read_file("save", "current_level") >= 2:
+                if read_file(account, "current_level") >= 2:
                     hit.kill()
                     self.enter_level_from_home("lvl2.tmx")
             elif hit.type == "doorlvl3":
-                if read_file("save", "current_level") >= 3:
+                if read_file(account, "current_level") >= 3:
                     hit.kill()
                     self.enter_level_from_home("lvl3.tmx")
             elif hit.type == "doorlvl4":
-                if read_file("save", "current_level") >= 4:
+                if read_file(account, "current_level") >= 4:
                     hit.kill()
                     self.enter_level_from_home("lvl4.tmx")
             elif hit.type == "doorlvl5":
-                if read_file("save", "current_level") >= 5:
+                if read_file(account, "current_level") >= 5:
                     hit.kill()
                     self.enter_level_from_home("lvl5.tmx")
             elif hit.type == "doorlvl6":
-                if read_file("save", "current_level") >= 6:
+                if read_file(account, "current_level") >= 6:
                     hit.kill()
                     self.enter_level_from_home("lvl6.tmx")
             elif hit.type == "doorlvl7":
-                if read_file("save", "current_level") >= 7:
+                if read_file(account, "current_level") >= 7:
                     hit.kill()
                     self.enter_level_from_home("lvl7.tmx")
             elif hit.type == "doorlvl8":
-                if read_file("save", "current_level") >= 8:
+                if read_file(account, "current_level") >= 8:
                     hit.kill()
                     self.enter_level_from_home("lvl8.tmx")
             elif hit.type == "doorlvl9":
-                if read_file("save", "current_level") >= 9:
+                if read_file(account, "current_level") >= 9:
                     hit.kill()
                     self.enter_level_from_home("lvl9.tmx")
             elif hit.type == "doorlvl10":
-                if read_file("save", "current_level") >= 10:
+                if read_file(account, "current_level") >= 10:
                     hit.kill()
                     self.enter_level_from_home("lvl10.tmx")
 
@@ -474,7 +475,7 @@ class Game:
                 if self.player.health <= 0:
                     self.player.health = self.player.max_health
                     self.playing = False
-                write_file("save", "hp", self.player.health)
+                write_file(account, "hp", self.player.health)
         if hits:
             if not self.player.damaged:
                 self.player.hit()
@@ -521,17 +522,17 @@ class Game:
                 if ev.type == pygame.MOUSEBUTTONDOWN:
                     # accept
                     if acceptX <= mouse[0] <= acceptX + sizeX and acceptY <= mouse[1] <= acceptY + sizeY:
-                        konto = read_file("save", currency.lower())
+                        konto = read_file(account, currency.lower())
                         if konto >= cost_to_nxt_lvl and not max_level_reached:
                             self.shop = False
                             self.time_start_buy_cooldown = time.time()
                             print("Buy:", item.type, cost_to_nxt_lvl, currency, " from ", cur_lvl, " to ", cur_lvl + 1)
                             # currency abziehen
-                            write_file("save", currency.lower(), konto - cost_to_nxt_lvl)
+                            write_file(account, currency.lower(), konto - cost_to_nxt_lvl)
                             # lvl aufsteigen
-                            write_file("save", cur_lvl_path, level_after_buy)
+                            write_file(account, cur_lvl_path, level_after_buy)
                             # wert aufsteigen
-                            write_file("save", cur_value_path, complete_value_by_next_lvl)
+                            write_file(account, cur_value_path, complete_value_by_next_lvl)
 
                             self.info_update()
                         elif max_level_reached:
@@ -744,6 +745,128 @@ class Game:
             displayQuest(False)
             self.dialogue("alert", MSG)
 
+    def create_inventory_frame(self):
+        sizeX = WIDTH - 80
+        sizeY = 35
+
+        # 40, shopY + 150 + (50 * qN)
+        acceptX = 40
+        acceptY = 550
+
+        deniedX = WIDTH / 2 + 100
+        deniedY = 550
+
+        shopY = 50
+
+        trennlinie = "--------------------------------------------------------------------------" \
+                     "--------------------------------------------------------------------------"
+        global MSG
+        MSG = ""
+
+        self.screen.blit(self.dim_screen, (0, 0))
+
+
+        # Print Head Text
+        self.draw_text("INVENTORY", self.title_font, 105, LIGHT_GREY, WIDTH / 2, shopY, align="center")
+        self.draw_text(trennlinie, self.title_font, 10, LIGHT_GREY, WIDTH / 2, shopY + 50, align="center")
+
+        # write text
+        self.draw_text("Du hast Folgendes im Inventar!", self.hud_font, 40, LIGHT_GREY, WIDTH / 2, shopY + 100,align="center")
+        # self.draw_text("Aktiv", self.hud_font, 30, WHITE, WIDTH / 10-10, shopY + 170, align="ne")
+        self.draw_text("Anzahl", self.hud_font, 30, CYAN, WIDTH / 10, shopY + 155, align="nw")
+        self.draw_text("Item", self.hud_font, 30, CYAN, WIDTH / 2 - WIDTH / 7, shopY + 155, align="nw")
+        self.draw_text("Beschreibung", self.hud_font, 30, CYAN, WIDTH / 2 + WIDTH / 10, shopY + 155, align="nw")
+        self.draw_text(trennlinie, self.title_font, 10, LIGHT_GREY, WIDTH / 2, shopY + 200, align="center")
+
+
+        def showItem(sortByType):
+            inv = get_inventory(account)
+            mouse = pg.mouse.get_pos()
+            reihe = 0
+            reiheC=0
+            for i in inv:
+                if reiheC % 2 == 0:
+                    pygame.draw.rect(self.screen, GREY, [50, shopY + 225 + reiheC * 30, WIDTH-100, 27])
+                else:
+                    pygame.draw.rect(self.screen, LIGHT_BLUE, [50, shopY + 225 + reiheC * 30, WIDTH - 100, 27])
+                reiheC = reiheC + 1
+            if sortByType == "Item":
+                for key in sorted(inv):
+                    self.draw_text("%s " % (inv[key]), self.hud_font, 25, WHITE, WIDTH / 10, shopY + 220 + reihe * 30,align="nw")
+                    self.draw_text("{}".format("%s " % (key)), self.hud_font, 25, WHITE, WIDTH / 2 - WIDTH / 7, shopY + 220 + reihe * 30, align="nw")
+                    self.draw_text("{}".format("* "), self.hud_font, 25, RED, WIDTH / 2 - WIDTH / 7, shopY + 155, align="ne")
+                    reihe = reihe + 1
+
+            elif sortByType == "Zahl":
+                sorted_dict = {}
+                sorted_keys = sorted(inv, key=inv.get)
+                for w in sorted_keys:
+                    sorted_dict[w] = inv[w]
+                for k in sorted_keys:
+                    self.draw_text("{}".format(sorted_dict[k]), self.hud_font, 25, WHITE, WIDTH / 10,shopY + 220 + reihe * 30, align="nw")
+                    self.draw_text("{}".format(k), self.hud_font, 25, WHITE, WIDTH / 2 - WIDTH / 7, shopY + 220 + reihe * 30, align="nw")
+                    self.draw_text("* ", self.hud_font, 25, RED, WIDTH / 10, shopY + 155, align="ne")
+                    self.draw_text("* ", self.hud_font, 25, BLACK, WIDTH / 10, shopY + 155, align="ne")
+                    reihe = reihe + 1
+        showItem("Item")
+
+        def mouse():
+            ############################################################
+            # window = pygame.display.set_mode((WIDTH, HEIGHT))
+            # rectangle = pygame.draw.rect(window, (255, 0, 0), (100, 100, 100, 100))
+            # # pygame.display.update()
+            #
+            # # Mouse position and button clicking
+            # pos = pygame.mouse.get_pos()
+            # pressed1 = pygame.mouse.get_pressed()[0]
+            #
+            # # Check if rectangle collided with pos and if the left mouse button was pressed
+            # if rectangle.collidepoint(pos) and pressed1:
+            #     print("You have opened a chest!")
+
+            #Sort by Name
+            x, y = pg.mouse.get_pos()
+            if x >= WIDTH / 10:
+                if y >= shopY + 155:
+                    if x <= WIDTH / 10 + 100:
+                        if y <= shopY + 155 + 50:
+                            if pygame.mouse.get_pressed()[0]:
+                                showItem("Zahl")
+                                pg.time.wait(400)
+
+            if x >= WIDTH / 2 - WIDTH / 7:
+                if y >= shopY + 155:
+                    if x <= WIDTH / 2 - WIDTH / 7 + 100:
+                        if y <= shopY + 155 + 50:
+                            if pygame.mouse.get_pressed()[0]:
+                                showItem("Item")
+                                pg.time.wait(400)
+
+
+            # 40 <= mouse[0] <= 40 + sizeX and shopY + 150 + (50 * reiheC) <= mouse[1] <= shopY + 150 + (50 * reiheC) + sizeY:
+            #     pygame.draw.rect(self.screen, LIGHT_GREEN, [40, shopY + 150 + (50 * reiheC), sizeX, sizeY])
+
+        #############################################################
+
+        # LOOP
+        self.inventory = not self.inventory
+        while self.inventory:
+            self.clock.tick(FPS)
+            pygame.event.pump()
+            mouse()
+
+            for event in pg.event.get():
+                if event.type == pygame.QUIT:
+                    self.playing = False
+                elif event.type == pg.KEYDOWN:
+                    if event.key == pg.K_ESCAPE or event.key == pg.K_i:
+                        self.inventory = not self.inventory
+
+
+            pg.display.update()
+
+
+
     def finish_quest(self, quest):
         currency = get_quest_attribute(quest, "currency")
         require = get_quest_attribute(quest, "require")
@@ -755,6 +878,7 @@ class Game:
                 # get reward
                 self.add_xp(get_quest_attribute(quest, "reward_xp"))
                 self.add_coin(get_quest_attribute(quest, "reward_coin"))
+                add_item_to_inventory(account, get_quest_attribute(quest, "reward_item"), 1)
 
                 # update quest
                 set_quest_completed(quest)
@@ -769,20 +893,20 @@ class Game:
                 # get reward
                 self.add_xp(get_quest_attribute(quest, "reward_xp"))
                 self.add_coin(get_quest_attribute(quest, "reward_coin"))
-
+                add_item_to_inventory(account, get_quest_attribute(quest, "reward_item"), 1)
                 # update quest
                 set_quest_completed(quest)
                 return True
             else:
                 return False
         elif currency == "level":
-            if read_file("save", require[:-3].strip()) >= int(require[-3:]):
+            if read_file(account, require[:-3].strip()) >= int(require[-3:]):
                 # take away
 
                 # get reward
                 self.add_xp(get_quest_attribute(quest, "reward_xp"))
                 self.add_coin(get_quest_attribute(quest, "reward_coin"))
-
+                add_item_to_inventory(account, get_quest_attribute(quest, "reward_item"), 1)
                 # update quest
                 set_quest_completed(quest)
                 return True
@@ -802,7 +926,7 @@ class Game:
             pass
 
     def update_quest_event(self):
-        if get_quest_attribute("LVL2maxHP", "available") == False and read_file("save", "UPGRADE_LEVEL_max_health_up") >= 1:
+        if get_quest_attribute("LVL2maxHP", "available") == False and read_file(account, "UPGRADE_LEVEL_max_health_up") >= 1:
             set_available("LVL2maxHP")
         elif get_quest_attribute("LVL5maxHP", "available") == False and is_completed("LVL2maxHP"):
             set_available("LVL5maxHP")
@@ -824,10 +948,10 @@ class Game:
                 text3 = "\n verbessern?"
 
                 cur_lvl_path = "UPGRADE_LEVEL_max_health_up"
-                cur_lvl = read_file("save", "UPGRADE_LEVEL_max_health_up")
+                cur_lvl = read_file(account, "UPGRADE_LEVEL_max_health_up")
 
                 cur_value_path = "max_hp"
-                cur_value = read_file("save", "max_hp")
+                cur_value = read_file(account, "max_hp")
 
                 cost_to_nxt_lvl = (cur_lvl * math.pi) + cur_lvl * (cur_lvl / 15)
                 cost_to_nxt_lvl = round(cost_to_nxt_lvl)
@@ -856,10 +980,10 @@ class Game:
                 text3 = "\n verbessern?"
 
                 cur_lvl_path = "UPGRADE_LEVEL_health_pack_up"
-                cur_lvl = read_file("save", "UPGRADE_LEVEL_health_pack_up")
+                cur_lvl = read_file(account, "UPGRADE_LEVEL_health_pack_up")
 
                 cur_value_path = "health_pack"
-                cur_value = read_file("save", "health_pack")
+                cur_value = read_file(account, "health_pack")
 
                 cost_to_nxt_lvl = (cur_lvl * 2.2) + 1
                 cost_to_nxt_lvl = round(cost_to_nxt_lvl)
@@ -886,10 +1010,10 @@ class Game:
                 text3 = "\n verbessern?"
 
                 cur_lvl_path = "UPGRADE_LEVEL_auto_reg_up_time"
-                cur_lvl = read_file("save", "UPGRADE_LEVEL_auto_reg_up_time")
+                cur_lvl = read_file(account, "UPGRADE_LEVEL_auto_reg_up_time")
 
                 cur_value_path = "auto_reg_time"
-                cur_value = read_file("save", "auto_reg_time")
+                cur_value = read_file(account, "auto_reg_time")
 
                 cost_to_nxt_lvl = (cur_value * 0.5) * cur_value + (cur_lvl * 2)
                 cost_to_nxt_lvl = round(cost_to_nxt_lvl)
@@ -916,10 +1040,10 @@ class Game:
                 text3 = "\n verbessern?"
 
                 cur_lvl_path = "UPGRADE_LEVEL_auto_reg_amount"
-                cur_lvl = read_file("save", "UPGRADE_LEVEL_auto_reg_amount")
+                cur_lvl = read_file(account, "UPGRADE_LEVEL_auto_reg_amount")
 
                 cur_value_path = "auto_reg_amount"
-                cur_value = read_file("save", "auto_reg_amount")
+                cur_value = read_file(account, "auto_reg_amount")
 
                 cost_to_nxt_lvl = (cur_value * 0.3) * cur_value / 2 + (cur_lvl * 2.5)
                 cost_to_nxt_lvl = round(cost_to_nxt_lvl)
@@ -947,10 +1071,10 @@ class Game:
                 text3 = "\n anzeigen lassen?"
 
                 cur_lvl_path = "UPGRADE_LEVEL_show_player_hp"
-                cur_lvl = read_file("save", "UPGRADE_LEVEL_show_player_hp")
+                cur_lvl = read_file(account, "UPGRADE_LEVEL_show_player_hp")
 
                 cur_value_path = "auto_reg_amount"
-                cur_value = read_file("save", "auto_reg_amount")
+                cur_value = read_file(account, "auto_reg_amount")
 
                 cost_to_nxt_lvl = 25
                 cost_to_nxt_lvl = round(cost_to_nxt_lvl)
@@ -1045,12 +1169,12 @@ class Game:
 
     def add_coin(self, coins):
         self.coins = self.coins + coins
-        write_file("save", "coins", self.coins)
+        write_file(account, "coins", self.coins)
 
     def add_xp(self, xp):
         self.xp_points = self.xp_points + xp
         self.get_xp_lvl()
-        write_file("save", "xp_points", self.xp_points)
+        write_file(account, "xp_points", self.xp_points)
 
     def get_xp_lvl(self):
         xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
@@ -1059,8 +1183,8 @@ class Game:
             self.xp_points = self.xp_points % xp_needed
             xp_needed = (24 + ((self.xp_lvl) * (self.xp_lvl / 100)) * 2.8)
 
-        write_file("save", "xp", self.xp_lvl)
-        write_file("save", "xp_points", self.xp_points)
+        write_file(account, "xp", self.xp_lvl)
+        write_file(account, "xp_points", self.xp_points)
 
 
     def use_compas(self):
@@ -1094,11 +1218,11 @@ class Game:
 
             npcRandomChat = []
 
-            storyLVL = read_file("save", npcType)
+            storyLVL = read_file(account, npcType)
 
             # welcom MSG
             if storyLVL == 0:
-                write_file("save", npcType, 1)
+                write_file(account, npcType, 1)
                 text = globals()[npcType]["welcome"]["welcome"]
             # Text MSG
             else:
@@ -1107,7 +1231,7 @@ class Game:
                     textGroup = textMode + str(storyLVL)
                     try:
                         text = globals()[npcType][textMode][textGroup]
-                        write_file("save", npcType, storyLVL + 1)
+                        write_file(account, npcType, storyLVL + 1)
                     except:
                         self.dialogue(str(npcType), "random")
 
@@ -1117,7 +1241,7 @@ class Game:
                     textGroup = textMode + str(storyLVL)
                     try:
                         text = globals()[npcType][textMode][textGroup]
-                        write_file("save", npcType, storyLVL + 1)
+                        write_file(account, npcType, storyLVL + 1)
                     except:
                         self.dialogue(str(npcType), "random")
                         self.create_quest_frame()
@@ -1219,20 +1343,23 @@ class Game:
                 if event.key == pg.K_c:
                     self.create_quest_frame()
                 if event.key == pg.K_i:
-                    print("inv")
-                    # print(get_inventory("save"))
-                    # print(is_item_in_inventory("save", "baum"))
-                    #print(get_amount_from_item_in_inventory("save", "baum"))
-                    print(add_item_to_inventory("save", "fuchs", 10))
+                    print("Open inv")
+                    add_item_to_inventory(account, "eisen Schuh", 5)
+                    # remove_item_from_inventory(account, "fuchs", 4)
+                    # inv = str(get_inventory(account))
+                    # inv = inv.replace("{","")
+                    # inv = inv.replace("}","")
+                    # inv = inv.replace("'","")
 
+                    self.create_inventory_frame()
+                    # self.dialogue("alert", inv)
 
                 if event.key == pg.K_n:
                     self.night = not self.night
                 if event.key == pg.K_0:
                     self.info_update()
                     self.get_coin(2)
-                    # write_file("save", "coins", read_file("save","coins")+2)
-                    self.coins = read_file("save", "coins")
+                    self.coins = read_file(account, "coins")
                     print("+2 Coins")
                     self.get_ammo()
                     self.player.max_health = 1000
@@ -1240,29 +1367,29 @@ class Game:
                     self.player.max_stamina = 1000
                     self.player.stamina = 1000
                 if event.key == pg.K_1:
-                    if read_file("save", "pistol_ammo") >= 0:
+                    if read_file(account, "pistol_ammo") >= 0:
                         self.player.weapon = "pistol"
-                        self.ammo = read_file("save", self.player.weapon + "_ammo")
+                        self.ammo = read_file(account, self.player.weapon + "_ammo")
                     pass
                 if event.key == pg.K_2:
-                    if read_file("save", "shotgun_ammo") >= 0:
+                    if read_file(account, "shotgun_ammo") >= 0:
                         self.player.weapon = "shotgun"
-                        self.ammo = read_file("save", self.player.weapon + "_ammo")
+                        self.ammo = read_file(account, self.player.weapon + "_ammo")
                     pass
                 if event.key == pg.K_3:
-                    if read_file("save", "sniper_ammo") >= 0:
+                    if read_file(account, "sniper_ammo") >= 0:
                         self.player.weapon = "sniper"
-                        self.ammo = read_file("save", self.player.weapon + "_ammo")
+                        self.ammo = read_file(account, self.player.weapon + "_ammo")
                     pass
                 if event.key == pg.K_4:
-                    if read_file("save", "rifle_ammo") >= 0:
+                    if read_file(account, "rifle_ammo") >= 0:
                         self.player.weapon = "rifle"
-                        self.ammo = read_file("save", self.player.weapon + "_ammo")
+                        self.ammo = read_file(account, self.player.weapon + "_ammo")
                     pass
                 if event.key == pg.K_5:
-                    if read_file("save", "laser_ammo") >= 0:
+                    if read_file(account, "laser_ammo") >= 0:
                         self.player.weapon = "laser"
-                        self.ammo = read_file("save", self.player.weapon + "_ammo")
+                        self.ammo = read_file(account, self.player.weapon + "_ammo")
                     pass
                 if event.key == pg.K_6:
                     print(6)
@@ -1304,8 +1431,8 @@ class Game:
         pg.display.flip()
         self.wait_for_key()
         if not self.level_selectet:
-            self.current_level = read_file("save", "current_level") + 1
-            write_file("save", "current_level", self.current_level)
+            self.current_level = read_file(account, "current_level") + 1
+            write_file(account, "current_level", self.current_level)
 
         self.new("home.tmx")
 
@@ -1314,14 +1441,14 @@ class Game:
         self.draw_text("Let's Go!", self.title_font, 100, BROWN, WIDTH / 2, HEIGHT / 2, align="center")
         self.draw_text("Press ENTER to Fight!", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4,
                        align="center")
-        self.compas_lvl = read_file("save", "compas_lvl")
-        self.compas_all = read_file("save", "compas_all")
+        self.compas_lvl = read_file(account, "compas_lvl")
+        self.compas_all = read_file(account, "compas_all")
 
         pg.display.flip()
         self.wait_for_key()
 
         try:
-            self.new(MAPS[read_file("save", "current_level") + 1])
+            self.new(MAPS[read_file(account, "current_level") + 1])
         except:
             self.new("home.tmx")
 
@@ -1330,8 +1457,8 @@ class Game:
         self.draw_text("Let's Go!", self.title_font, 100, BROWN, WIDTH / 2, HEIGHT / 2, align="center")
         self.draw_text("Press ENTER to Fight!", self.hud_font, 75, LIGHT_GREY, WIDTH / 2, HEIGHT * 3 / 4,
                        align="center")
-        self.compas_lvl = read_file("save", "compas_lvl")
-        self.compas_all = read_file("save", "compas_all")
+        self.compas_lvl = read_file(account, "compas_lvl")
+        self.compas_all = read_file(account, "compas_all")
 
         pg.display.flip()
         self.wait_for_key()
